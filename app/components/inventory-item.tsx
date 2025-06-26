@@ -200,7 +200,11 @@ export function InventoryItem({
           equipped={equipped}
           item={item}
           onClick={
-            onClick !== undefined ? close(() => onClick(uid)) : undefined
+            canUnlockContainer
+              ? () => onUnlockContainer?.(uid) // сразу открыть кейс
+              : onClick !== undefined
+                ? close(() => onClick(uid))
+                : undefined
           }
         />
       </div>
