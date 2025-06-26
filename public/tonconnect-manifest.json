@@ -1,0 +1,7 @@
+{
+  "manifest_version": "0.1",
+  "name": "CS2 Inventory Simulator (Dev)",
+  "url": "http://localhost:3001",
+  "icon_url": "https://ton.org/favicon.ico",
+  "network": "testnet"
+}
