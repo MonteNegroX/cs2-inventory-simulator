@@ -31,6 +31,7 @@ import { InventoryFilter } from "./inventory-filter";
 import { useItemSelector } from "./item-selector-context";
 import { Logo } from "./logo";
 import { TonConnectButton } from "@tonconnect/ui-react";
+import { WalletBalanceStub } from "~/components/WalletBalanceStub";
 
 export function Header({
   showInventoryFilter
@@ -78,6 +79,7 @@ export function Header({
             />
           </button>
           <TonConnectButton />
+          <WalletBalanceStub />
         </div>
         {(isDesktop || isMenuOpen) && (
           <div className="absolute left-0 mt-2 w-full flex-1 px-4 lg:static lg:mt-0 lg:w-auto lg:p-0">
