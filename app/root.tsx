@@ -47,7 +47,8 @@ import { getSeoLinks, getSeoMeta } from "./root-seo";
 import { getSession } from "./session.server";
 import styles from "./tailwind.css?url";
 import { nonEmptyString } from "./utils/misc";
-import { TonProvider } from "./TonProvider"; // ✅ добавь импорт
+import { TonProvider } from "./TonProvider";
+import { WalletBalanceProvider } from "~/components/WalletBalanceContext"; // ✅ добавь импорт
 
 
 const bodyFontUrl =
@@ -129,6 +130,7 @@ export default function App() {
       </head>
       <body className="overflow-y-scroll bg-stone-800">
         <AppProvider {...appProps}>
+          <WalletBalanceProvider>
           <TonProvider>
             <Splash />
             <Background />
@@ -150,6 +152,7 @@ export default function App() {
             />
             <Scripts />
           </TonProvider>
+            </WalletBalanceProvider>
         </AppProvider>
       </body>
     </html>

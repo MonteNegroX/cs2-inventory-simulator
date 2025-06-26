@@ -16,8 +16,11 @@ import { ItemEditor, ItemEditorAttributes } from "./item-editor";
 import { Modal, ModalHeader } from "./modal";
 import { ModalButton } from "./modal-button";
 import { Select } from "./select";
+import { useFakeWalletBalance} from "~/components/hooks/useFakeWalletBalance";
+import { useWalletBalance } from "~/components/WalletBalanceContext";
 
 const KEY_MAX_QUANTITY = 20;
+const KEY_PRICE = 1.5; // 🔧 стоимость ключа в TON
 
 export function UnlockCaseContainerAddKey({
   caseUid,
@@ -33,6 +36,10 @@ export function UnlockCaseContainerAddKey({
   const [amount, setAmount] = useState("1");
   const [isCrafting, toggleIsCrafting] = useToggle(false);
   const [attributes, setAttributes] = useState<ItemEditorAttributes>();
+  const { balance, deduct } = useWalletBalance(); // 🔧 добавлен вызов баланса
+  const [error, setError] = useState(""); // 🔧 состояние для ошибки
+
+
 
   const maxQuantity = Math.min(
     inventoryMaxItems - inventory.size(),
@@ -42,10 +49,20 @@ export function UnlockCaseContainerAddKey({
 
   function handleClose() {
     toggleIsCrafting();
+    setError(""); // 🔧 сброс ошибки при закрытии
+
   }
 
   function handleCraft() {
     assert(attributes);
+    const totalPrice = attributes.quantity * KEY_PRICE; // 🔧 расчёт итоговой стоимости
+    if (!deduct(totalPrice)) {
+      setError(`Not enough TON. You need ${totalPrice.toFixed(2)} TON.`);
+      return;
+    }
+
+    setError(""); // 🔧 очистка ошибки
+
     const inventoryItem = { id: neededKeyItem.id };
     range(attributes.quantity).forEach(() => {
       setInventory(inventory.add(inventoryItem));
@@ -63,6 +80,8 @@ export function UnlockCaseContainerAddKey({
         keyUid: firstKey.uid
       });
     }
+    toggleIsCrafting(); // 🔧 закрыть модалку после крафта
+
   }
 
   return maxQuantity === 0 ? null : (
@@ -81,7 +100,7 @@ export function UnlockCaseContainerAddKey({
       <ModalButton
         children={translate("CaseAdd")}
         variant="primary"
-        onClick={handleClose}
+        onClick={toggleIsCrafting} // 🔧 раньше был handleClose
       />
       {isCrafting && (
         <Modal className="w-[420px]" fixed>
@@ -96,6 +115,12 @@ export function UnlockCaseContainerAddKey({
             maxQuantity={maxQuantity}
             onChange={setAttributes}
           />
+          <div className="my-2 text-center text-sm text-white">
+            Key price: {KEY_PRICE} TON / each — You have {balance.toFixed(2)} TON
+          </div>
+          {error && (
+            <div className="mb-2 text-center text-sm text-red-400">{error}</div>
+          )}
           <div className="my-6 flex justify-center gap-2">
             <ModalButton
               children={translate("EditorCancel")}

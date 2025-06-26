@@ -15,6 +15,7 @@ import { UnlockCaseContainerContents } from "./unlock-case-container-contents";
 import { UnlockCaseWheel } from "./unlock-case-wheel";
 import { UseItemFooter } from "./use-item-footer";
 import { UseItemHeader } from "./use-item-header";
+import { UnlockContainerButton} from "~/components/UnlockCointainerButton";
 
 export function UnlockCaseContainer({
   canUnlock,
@@ -58,6 +59,7 @@ export function UnlockCaseContainer({
           title={translate("CaseUnlockContainer")}
           warning={translate("CaseOnceWarn")}
         />
+
         <UnlockCaseWheel
           caseItem={caseItem}
           isDisplaying={isDisplaying}

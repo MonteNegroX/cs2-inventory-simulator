@@ -2,7 +2,7 @@
 import React from 'react';
 
 export function WalletBalanceStub() {
-  const fakeBalance = 12.345; // можно поменять на любое число
+  const fakeBalance = 0.345; // можно поменять на любое число
 
   return (
     <div className="text-xs text-white px-2 py-1 bg-stone-700 rounded ml-2">
