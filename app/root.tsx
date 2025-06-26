@@ -47,6 +47,8 @@ import { getSeoLinks, getSeoMeta } from "./root-seo";
 import { getSession } from "./session.server";
 import styles from "./tailwind.css?url";
 import { nonEmptyString } from "./utils/misc";
+import { TonProvider } from "./TonProvider"; // ✅ добавь импорт
+
 
 const bodyFontUrl =
   "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,400..800;1,62.5..100,400..800&display=swap";
@@ -104,53 +106,56 @@ export default function App() {
   const { footer, header, inventory } = useRootLayout();
 
   return (
-    <AppProvider {...appProps}>
-      <html
-        lang={appProps.preferences.lang}
-        onContextMenu={(event) => event.preventDefault()}
-      >
-        <head>
-          <meta charSet="utf-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1" />
-          <TranslationScript />
-          <Meta />
-          <Links />
-          <link
-            rel="icon"
-            href={appProps.rules.appFaviconUrl || "/favicon.ico"}
-            type={appProps.rules.appFaviconMimeType || "image/x-icon"}
-          />
-          {getSeoLinks(appProps.rules).map((attributes, index) => (
-            <link key={index} {...attributes} />
-          ))}
-          {getSeoMeta(appProps.rules).map((attributes, index) => (
-            <meta key={index} {...attributes} />
-          ))}
-        </head>
-        <body className="overflow-y-scroll bg-stone-800">
-          <Splash />
-          <Background />
-          <Console />
-          <SyncWarn />
-          {(header || inventory) && (
-            <ItemSelectorProvider>
-              {header && <Header showInventoryFilter={inventory} />}
-              {inventory && <Inventory />}
-            </ItemSelectorProvider>
-          )}
-          <Outlet />
-          {footer && <Footer />}
-          <SyncIndicator />
-          <ScrollRestoration />
-
-          <CloudflareAnalyticsScript
-            token={appProps.rules.cloudflareAnalyticsToken}
-          />
-          <Scripts />
-        </body>
-      </html>
-    </AppProvider>
+    <html
+      lang={appProps.preferences.lang}
+      onContextMenu={(event) => event.preventDefault()}
+    >
+      <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <Meta />
+        <Links />
+        <link
+          rel="icon"
+          href={appProps.rules.appFaviconUrl || "/favicon.ico"}
+          type={appProps.rules.appFaviconMimeType || "image/x-icon"}
+        />
+        {getSeoLinks(appProps.rules).map((attributes, index) => (
+          <link key={index} {...attributes} />
+        ))}
+        {getSeoMeta(appProps.rules).map((attributes, index) => (
+          <meta key={index} {...attributes} />
+        ))}
+      </head>
+      <body className="overflow-y-scroll bg-stone-800">
+        <AppProvider {...appProps}>
+          <TonProvider>
+            <Splash />
+            <Background />
+            <Console />
+            <SyncWarn />
+            {(header || inventory) && (
+              <ItemSelectorProvider>
+                {header && <Header showInventoryFilter={inventory} />}
+                {inventory && <Inventory />}
+              </ItemSelectorProvider>
+            )}
+            <Outlet />
+            {footer && <Footer />}
+            <SyncIndicator />
+            <ScrollRestoration />
+            <TranslationScript/>
+            <CloudflareAnalyticsScript
+              token={appProps.rules.cloudflareAnalyticsToken}
+            />
+            <Scripts />
+          </TonProvider>
+        </AppProvider>
+      </body>
+    </html>
   );
 }
+
+
 
 export { ErrorBoundary } from "~/components/error-boundary";
