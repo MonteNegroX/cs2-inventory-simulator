@@ -33,6 +33,7 @@ import { InventoryItemTooltip } from "./inventory-item-tooltip";
 import { alert, confirm } from "./modal-generic";
 import { useWalletBalance} from "~/components/WalletBalanceContext";
 import { CS2ItemType, CS2RarityColor }  from "@ianlucas/cs2-lib";
+import { applyCustomOverrides } from "~/utils/custom-overrides";
 
 export function InventoryItem({
   disableContextMenu,
@@ -107,6 +108,8 @@ export function InventoryItem({
   const dynamicPrice =
     item.price ??
     (item.type === CS2ItemType.Sticker && item.rarity === CS2RarityColor.Rare ? 1 : undefined);
+  const overriddenItem = applyCustomOverrides(item);
+
 
   const {
     clickContext,
@@ -204,7 +207,7 @@ export function InventoryItem({
       >
         <InventoryItemTile
           equipped={equipped}
-          item={item}
+          item={overriddenItem}  // ✅ используем кастом
           onClick={
             canUnlockContainer
               ? () => onUnlockContainer?.(uid) // сразу открыть кейс
@@ -430,7 +433,7 @@ export function InventoryItem({
             forwardRef={hoverRefs.setFloating}
             style={hoverStyles}
             {...getHoverFloatingProps()}
-            item={item}
+            item={overriddenItem}  // ✅ используем кастом
           />
         </FloatingFocusManager>
       )}

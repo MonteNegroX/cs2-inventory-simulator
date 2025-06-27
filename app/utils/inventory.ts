@@ -14,6 +14,8 @@ import {
 } from "@ianlucas/cs2-lib";
 import lzstring from "lz-string";
 import { serverInventoryShape } from "./shapes";
+import { applyCustomOverrides } from "~/utils/custom-overrides";
+
 
 export const UNLOCKABLE_ITEM_TYPE: CS2ItemTypeValues[] = [
   CS2ItemType.Container,
@@ -61,16 +63,21 @@ export function createFakeInventoryItem(
     props
   );
   Object.assign(inventoryItem, item);
+
+  applyCustomOverrides(inventoryItem); // ✅ это должно быть здесь
+
   return inventoryItem;
 }
 
 export function createFakeInventoryItemFromBase(item: CS2BaseInventoryItem) {
-  return new CS2InventoryItem(
+  const inventoryItem = new CS2InventoryItem(
     fakeInventory,
     -1,
     item,
     CS2Economy.getById(item.id)
   );
+  applyCustomOverrides(inventoryItem); // ✅
+  return inventoryItem;
 }
 
 export function getFreeItemsToDisplay(hideFreeItems = false) {

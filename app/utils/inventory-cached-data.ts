@@ -14,7 +14,8 @@ export function getCachedInventoryData() {
   return {
     items: {
       "1": { id: 9504, equipped: false }, // Riptide Sticker Capsule
-      "2": { id: 999002, equipped: false } // Riptide Sticker Capsule
+      "2": { id: 999002, equipped: false }, // Riptide Sticker Capsule
+      "3": { id: 8471, equipped: false } // Riptide Sticker Capsule
     }
   };
 }
