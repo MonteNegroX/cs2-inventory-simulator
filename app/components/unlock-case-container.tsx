@@ -16,6 +16,7 @@ import { UnlockCaseWheel } from "./unlock-case-wheel";
 import { UseItemFooter } from "./use-item-footer";
 import { UseItemHeader } from "./use-item-header";
 import { UnlockContainerButton} from "~/components/UnlockCointainerButton";
+import { useWalletBalance } from "~/components/WalletBalanceContext";
 
 export function UnlockCaseContainer({
   canUnlock,
@@ -45,6 +46,17 @@ export function UnlockCaseContainer({
   const translate = useTranslate();
   const nameItemString = useNameItemString();
   const needsToAddKey = keyItem === undefined && neededKeyItem !== undefined;
+  const CASE_PRICE = 1;
+  const { balance, deduct } = useWalletBalance();
+
+  function handlePaidUnlock() {
+    if (!deduct(CASE_PRICE)) {
+      alert(translate("Недостаточно TON для открытия кейса"));
+      return;
+    }
+
+    onUnlock(); // запуск открытия кейса
+  }
 
   return (
     <>
@@ -104,7 +116,7 @@ export function UnlockCaseContainer({
                   <ModalButton
                     children={translate("CaseUnlockContainer")}
                     disabled={!canUnlock}
-                    onClick={onUnlock}
+                    onClick={handlePaidUnlock}
                     variant="primary"
                   />
                 ) : (
