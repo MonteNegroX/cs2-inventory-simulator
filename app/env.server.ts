@@ -17,3 +17,4 @@ export const {
   STEAM_API_KEY,
   STEAM_CALLBACK_URL
 } = process.env;
+export const USE_CUSTOM_ITEMS = process.env.USE_CUSTOM_ITEMS === "true";

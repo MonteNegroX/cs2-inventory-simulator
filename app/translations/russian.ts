@@ -119,6 +119,7 @@ export const russian = {
   InventoryItemRenameInvalidTooltip: /* csgo_russian.txt */"Введите допустимое имя.",
   InventoryItemRenamePlaceholder: /* csgo_russian.txt */"Новое название",
   InventoryItemRenameStorageUnit: /* csgo_russian.txt */"Сменить ярлык",
+  InventoryItemSell: "Продать",
   InventoryItemScrapeSticker: /* csgo_russian.txt */"Поскрести наклейку",
   InventoryItemStatTrak: /* csgo_russian.txt */"StatTrak™",
   InventoryItemStatTrakCount: /* csgo_russian.txt */"Убийства, записанные StatTrak™:",

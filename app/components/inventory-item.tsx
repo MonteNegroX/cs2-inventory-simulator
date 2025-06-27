@@ -31,6 +31,8 @@ import { InventoryItemContextMenu } from "./inventory-item-context-menu";
 import { InventoryItemTile } from "./inventory-item-tile";
 import { InventoryItemTooltip } from "./inventory-item-tooltip";
 import { alert, confirm } from "./modal-generic";
+import { useWalletBalance} from "~/components/WalletBalanceContext";
+import { CS2ItemType, CS2RarityColor }  from "@ianlucas/cs2-lib";
 
 export function InventoryItem({
   disableContextMenu,
@@ -101,6 +103,10 @@ export function InventoryItem({
   } = useRules();
   const [inventory] = useInventory();
   const user = useUser();
+  const { add } = useWalletBalance();
+  const dynamicPrice =
+    item.price ??
+    (item.type === CS2ItemType.Sticker && item.rarity === CS2RarityColor.Rare ? 1 : undefined);
 
   const {
     clickContext,
@@ -387,6 +393,14 @@ export function InventoryItem({
                     clickLabel: translate("InventoryItemShareCopied"),
                     onClick: () =>
                       copyToClipboard(getInventoryItemShareUrl(item, user?.id))
+                  },
+                  {
+                    condition: dynamicPrice !== undefined,
+                    label: "Продать",
+                    onClick: close(() => {
+                      add(dynamicPrice);
+                      onRemove?.(uid);
+                      })
                   },
                   {
                     condition: true,

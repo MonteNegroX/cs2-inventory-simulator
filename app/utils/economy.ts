@@ -20,6 +20,8 @@ import {
   CS2_WEAR_FACTOR,
   fail
 } from "@ianlucas/cs2-lib";
+import { loadCustomItems } from "~/utils/economy";
+import { USE_CUSTOM_ITEMS } from "~/env.server";
 
 export const cdnQueryString = "?v=6.1.2";
 
@@ -43,13 +45,18 @@ export const RarityLabel = {
   [CS2RarityColor.Immortal]: "Immortal"
 } as const;
 
-export function updateEconomyLanguage(
-  language: CS2ItemTranslationByLanguage[string]
-) {
-  CS2Economy.use({
-    items: CS2_ITEMS,
-    language
-  });
+export function updateEconomyLanguage(language: string) {
+    if (USE_CUSTOM_ITEMS) {
+        console.log("[Startup] Using CUSTOM ITEMS...");
+        loadCustomItems(language);
+    } else {
+        console.log("[Startup] Using CS2-LIB ITEMS...");
+    }
+
+    CS2Economy.use({
+        items: CS2_ITEMS,
+        language
+    });
 }
 
 export function isItemCountable(item: CS2EconomyItem) {
