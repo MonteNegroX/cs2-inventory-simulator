@@ -16,6 +16,8 @@ import { setupLogo } from "./logo.server";
 import { setupRules } from "./models/rule";
 import { setupPurge } from "./routines/setup-purge";
 import { setupTranslation } from "./translation.server";
+import { initEconomy } from "~/utils/economy.server";
+
 
 const ABORT_DELAY = 5_000;
 
