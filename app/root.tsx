@@ -48,6 +48,7 @@ import { getSession } from "./session.server";
 import styles from "./tailwind.css?url";
 import { nonEmptyString } from "./utils/misc";
 import { TonProvider } from "./TonProvider";
+import CustomInventory from "~/components/CustomInventory";
 import { WalletBalanceProvider } from "~/components/WalletBalanceContext"; // ✅ добавь импорт
 
 
@@ -131,34 +132,37 @@ export default function App() {
       <body className="overflow-y-scroll bg-stone-800">
         <AppProvider {...appProps}>
           <WalletBalanceProvider>
-          <TonProvider>
-            <Splash />
-            <Background />
-            <Console />
-            <SyncWarn />
-            {(header || inventory) && (
-              <ItemSelectorProvider>
-                {header && <Header showInventoryFilter={inventory} />}
-                {inventory && <Inventory />}
-              </ItemSelectorProvider>
-            )}
-            <Outlet />
-            {footer && <Footer />}
-            <SyncIndicator />
-            <ScrollRestoration />
-            <TranslationScript/>
-            <CloudflareAnalyticsScript
-              token={appProps.rules.cloudflareAnalyticsToken}
-            />
-            <Scripts />
-          </TonProvider>
-            </WalletBalanceProvider>
+            <TonProvider>
+              <Splash />
+              <Background />
+              <Console />
+              <SyncWarn />
+              {(header || inventory) && (
+                <ItemSelectorProvider>
+                  {header && <Header showInventoryFilter={inventory} />}
+                  {inventory && <Inventory />}
+                </ItemSelectorProvider>
+              )}
+
+              <Outlet />
+
+              {/* ✅ ВСТАВЛЯЕМ КАСТОМНЫЙ ИНВЕНТАРЬ */}
+              <CustomInventory />
+
+              {footer && <Footer />}
+              <SyncIndicator />
+              <ScrollRestoration />
+              <TranslationScript />
+              <CloudflareAnalyticsScript
+                token={appProps.rules.cloudflareAnalyticsToken}
+              />
+              <Scripts />
+            </TonProvider>
+          </WalletBalanceProvider>
         </AppProvider>
       </body>
     </html>
   );
 }
-
-
 
 export { ErrorBoundary } from "~/components/error-boundary";

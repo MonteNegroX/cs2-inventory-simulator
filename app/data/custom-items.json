@@ -1,0 +1,18 @@
+[
+  {
+    "id": 999001,
+    "name": "ChatGPT Knife",
+    "rarity": "Immortal",
+    "type": "Melee",
+    "image": "https://i.imgur.com/1G3w5QH.png",
+    "weight": 5
+  },
+  {
+    "id": 999002,
+    "name": "ChatGPT Pistol",
+    "rarity": "Rare",
+    "type": "Pistol",
+    "image": "https://i.imgur.com/ZWnhY9Z.png",
+    "weight": 95
+  }
+]

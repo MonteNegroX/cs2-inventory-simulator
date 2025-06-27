@@ -21,6 +21,7 @@ import {
   fail
 } from "@ianlucas/cs2-lib";
 import { loadCustomItems } from "~/utils/economy";
+import { CUSTOM_ITEMS } from "~/utils/custom-items";
 
 export const cdnQueryString = "?v=6.1.2";
 
@@ -44,7 +45,14 @@ export const RarityLabel = {
   [CS2RarityColor.Immortal]: "Immortal"
 } as const;
 
+export function loadCustomItems(language: string) {
+    console.log("[Startup] Loading CUSTOM ITEMS...");
 
+    CS2Economy.use({
+        items: CUSTOM_ITEMS,
+        language
+    });
+}
 
 export function isItemCountable(item: CS2EconomyItem) {
   return COUNTABLE_ITEM_TYPES.includes(item.type);
