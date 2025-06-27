@@ -11,6 +11,8 @@ import {
 } from "@ianlucas/cs2-lib";
 import { useTranslate } from "~/components/app-context";
 import { has } from "~/utils/misc";
+import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
+
 
 const ITEM_TYPES_WITHOUT_NAME: CS2ItemTypeValues[] = [
   CS2ItemType.Collectible,
@@ -43,7 +45,11 @@ export function nameItemFactory(translate: ReturnType<typeof useTranslate>) {
         ? `${translate("InventoryItemStatTrak")} `
         : "";
     const quality = item.isMelee() && !item.free ? "★ " : "";
-    let [model, ...names] = item.name.split("|").map((s) => s.trim());
+    // Применяем кастомное имя, если указано
+    const override = CUSTOM_OVERRIDES[item.id];
+    const overriddenName = override?.name ?? item.name;
+
+    let [model, ...names] = overriddenName.split("|").map((s) => s.trim());
     let name = names.join(" | ");
     model = `${quality}${statTrak}${model}`;
     if (item.isAgent()) {
