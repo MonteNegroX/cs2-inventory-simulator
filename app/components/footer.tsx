@@ -7,60 +7,38 @@ import { ClientOnly } from "remix-utils/client-only";
 import { DEFAULT_APP_FOOTER_NAME } from "~/app-defaults";
 import { isOurHostname } from "~/utils/misc";
 import { useRules } from "./app-context";
+import { Home, Zap, Flame, Rocket, User } from "lucide-react";
+import { Link, useLocation } from "react-router-dom";
 
 export function Footer() {
   const { sourceCommit, appFooterName } = useRules();
+  const location = useLocation();
+  const menuItems = [
+    { to: "/", label: "Main", icon: Home },
+    { to: "/weekly", label: "Weekly", icon: Zap },
+    { to: "/jackpot", label: "JackPot", icon: Flame },
+    { to: "/upgrade", label: "Upgrade", icon: Rocket },
+    { to: "/profile", label: "Profile", icon: User },
+  ];
 
   return (
-    <footer className="my-8 text-sm text-neutral-400 drop-shadow-xs select-none">
-      <div className="text-center text-sm">
-        <span>
-          &copy; {new Date().getFullYear()}{" "}
-          {appFooterName || DEFAULT_APP_FOOTER_NAME}
-        </span>
-      </div>
-      <ClientOnly
-        children={() =>
-          isOurHostname() ? (
-            <div className="flex items-center justify-center gap-2 text-xs">
-              {sourceCommit !== undefined && (
-                <>
-                  <a
-                    className="transition-all hover:text-blue-500"
-                    href={`https://github.com/ianlucas/cs2-inventory-simulator/commit/${sourceCommit}`}
-                    target="_blank"
-                  >
-                    Ver. {sourceCommit?.substring(0, 7)}
-                  </a>
-                  &middot;
-                </>
-              )}
-              <p>
-                Found an issue?{" "}
-                <a
-                  href="https://github.com/ianlucas/cs2-inventory-simulator/issues"
-                  className="underline hover:text-blue-500"
-                  target="_blank"
-                >
-                  Report it here
-                </a>
-                .
-              </p>
-            </div>
-          ) : (
-            <div className="text-center text-[10px]">
-              powered by{" "}
-              <a
-                href="https://github.com/ianlucas/cs2-inventory-simulator"
-                className="underline hover:text-blue-500"
-                target="_blank"
-              >
-                Inventory Simulator
-              </a>
-            </div>
-          )
-        }
-      />
+    <footer className="fixed bottom-0 left-0 z-50 flex w-full justify-around bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 p-2 backdrop-blur-md">
+      {menuItems.map((item) => {
+        const isActive = location.pathname === item.to;
+        const Icon = item.icon;
+        return (
+          <Link
+            key={item.to}
+            to={item.to}
+            className={`flex flex-col items-center justify-center text-white transition-transform duration-150 ${
+              isActive ? "scale-110 opacity-100" : "opacity-70 hover:opacity-90"
+            }`}
+          >
+            <Icon className="h-6 w-6" />
+            <span className="text-xs">{item.label}</span>
+          </Link>
+        );
+      })}
     </footer>
   );
 }
