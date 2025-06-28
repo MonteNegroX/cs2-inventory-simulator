@@ -91,14 +91,14 @@ export function UnlockCase({
     const output = Object.entries(results)
       .map(([id, count]) => {
         const item = CS2Economy.getById(Number(id));
-        const percentage = ((count / openCount) * 100).toFixed(2);
+        const percentage = ((count / openCount) * 1000).toFixed(2);
         return `${item.name} (${item.rarity}): ${count} (${percentage}%)`;
       })
       .join("\n");
 
-    console.log("🔹 Статистика по 100 открытиям кейса:");
+    console.log("🔹 Статистика по 1000 открытиям кейса:");
     console.log(output);
-    alert("✅ Имитация 100 открытий завершена. Смотри консоль для статистики.");
+    alert("✅ Имитация 1000 открытий завершена. Смотри консоль для статистики.");
   }
 
   const handleUnlock = OPEN_CASE_MODE === "SIMULATION"
