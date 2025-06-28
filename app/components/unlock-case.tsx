@@ -1,43 +1,22 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Ian Lucas. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
+// src/components/unlock-case/unlock-case.tsx (финальная версия под Remix + AppProvider)
 
 import { CS2Economy, CS2UnlockedItem } from "@ianlucas/cs2-lib";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ClientOnly } from "remix-utils/client-only";
 import {
   useInventoryItem,
   useTryInventoryItem
 } from "~/components/hooks/use-inventory-item";
 import { useTimer } from "~/components/hooks/use-timer";
-import {
-  ApiActionUnlockCaseActionData,
-  ApiActionUnlockCaseUrl
-} from "~/routes/api.action.unlock-case._index";
-import { dispatchSyncError, sync } from "~/sync";
 import { unlockNonSpecialItem } from "~/utils/economy";
-import { postJson } from "~/utils/fetch";
 import { range } from "~/utils/number";
 import { playSound } from "~/utils/sound";
-import { useInventory, useUser } from "./app-context";
+import { useInventory, useUser, useAppContext } from "./app-context";
 import { useKeyRelease } from "./hooks/use-key-release";
 import { useIsSyncing } from "./hooks/use-sync-state";
 import { Overlay } from "./overlay";
 import { UnlockCaseContainer } from "./unlock-case-container";
 import { UnlockCaseContainerUnlocked } from "./unlock-case-container-unlocked";
-
-async function unlockCase(caseUid: number, keyUid?: number) {
-  const { unlockedItem, syncedAt } =
-    await postJson<ApiActionUnlockCaseActionData>(ApiActionUnlockCaseUrl, {
-      syncedAt: sync.syncedAt,
-      caseUid,
-      keyUid
-    });
-  sync.syncedAt = syncedAt;
-  return unlockedItem;
-}
 
 export function UnlockCase({
   caseUid,
@@ -48,6 +27,8 @@ export function UnlockCase({
   keyUid?: number;
   onClose: () => void;
 }) {
+  const { env } = useAppContext();
+  const OPEN_CASE_MODE = env.OPEN_CASE_MODE ?? "CLASSIC";
   const user = useUser();
   const isSyncing = useIsSyncing();
   const [inventory, setInventory] = useInventory();
@@ -60,17 +41,13 @@ export function UnlockCase({
 
   const caseItem = useInventoryItem(caseUid);
   const neededKeyItem =
-    caseItem.keys !== undefined
-      ? CS2Economy.getById(caseItem.keys[0])
-      : undefined;
+    caseItem.keys !== undefined ? CS2Economy.getById(caseItem.keys[0]) : undefined;
   const keyItem = useTryInventoryItem(keyUid);
   const wait = useTimer();
 
   function addUnlockedItemToInventory() {
     const unlockedItem = unlockedItemRef.current;
-    if (unlockedItem === undefined) {
-      return;
-    }
+    if (!unlockedItem) return;
     setUnlockedItem(unlockedItem);
     setInventory(inventory.unlockContainer(unlockedItem, caseUid, keyUid));
     unlockedItemRef.current = undefined;
@@ -81,68 +58,83 @@ export function UnlockCase({
     onClose();
   }
 
-  async function handleUnlock() {
+  async function handleUnlockClassic() {
     try {
       setIsDisplaying(false);
       setCanUnlock(false);
-      const unlockedItem =
-        user === undefined
-          ? caseItem.unlockContainer()
-          : await unlockCase(caseUid, keyUid);
+      const unlockedItem = caseItem.unlockContainer();
       unlockedItemRef.current = unlockedItem;
       wait(() => {
         setHideCaseContents(true);
-        if (caseItem.keys !== undefined) {
-          playSound("case_unlock");
-        }
+        if (caseItem.keys !== undefined) playSound("case_unlock");
         wait(() => {
-          setItems(
-            range(32).map((_, index) =>
-              index === 28 ? unlockedItem : unlockNonSpecialItem(caseItem)
-            )
-          );
+          setItems(range(32).map((_, i) => (i === 28 ? unlockedItem : unlockNonSpecialItem(caseItem))));
           setIsDisplaying(true);
           wait(addUnlockedItemToInventory, 6000);
         }, 100);
       }, 250);
-    } catch {
-      dispatchSyncError();
+    } catch (e) {
+      console.error("Unlock error:", e);
       onClose();
     }
   }
 
+  async function handleUnlockSimulation() {
+    const openCount = 100;
+    const results: Record<number, number> = {};
+
+    for (let i = 0; i < openCount; i++) {
+      const unlockedItem = caseItem.unlockContainer();
+      results[unlockedItem.id] = (results[unlockedItem.id] || 0) + 1;
+    }
+
+    const output = Object.entries(results)
+      .map(([id, count]) => {
+        const item = CS2Economy.getById(Number(id));
+        const percentage = ((count / openCount) * 100).toFixed(2);
+        return `${item.name} (${item.rarity}): ${count} (${percentage}%)`;
+      })
+      .join("\n");
+
+    console.log("🔹 Статистика по 100 открытиям кейса:");
+    console.log(output);
+    alert("✅ Имитация 100 открытий завершена. Смотри консоль для статистики.");
+  }
+
+  const handleUnlock = OPEN_CASE_MODE === "SIMULATION"
+    ? handleUnlockSimulation
+    : handleUnlockClassic;
+
   useKeyRelease("Escape", handleClose);
 
-  return (
-    <ClientOnly
-      children={() =>
-        createPortal(
-          <Overlay isWrapperless>
-            {unlockedItem ? (
-              <UnlockCaseContainerUnlocked
-                caseItem={caseItem}
-                onClose={onClose}
-                unlockedItem={unlockedItem}
-              />
-            ) : (
-              <UnlockCaseContainer
-                canUnlock={canUnlock}
-                caseItem={caseItem}
-                caseUid={caseUid}
-                hideCaseContents={hideCaseContents}
-                isDisplaying={isDisplaying}
-                isSyncing={isSyncing}
-                items={items}
-                keyItem={keyItem}
-                neededKeyItem={neededKeyItem}
-                onClose={handleClose}
-                onUnlock={handleUnlock}
-              />
-            )}
-          </Overlay>,
-          document.body
-        )
-      }
-    />
+  if (typeof document === "undefined") {
+    return null;
+  }
+
+  return createPortal(
+    <Overlay isWrapperless>
+      {unlockedItem ? (
+        <UnlockCaseContainerUnlocked
+          caseItem={caseItem}
+          onClose={onClose}
+          unlockedItem={unlockedItem}
+        />
+      ) : (
+        <UnlockCaseContainer
+          canUnlock={true}
+          caseItem={caseItem}
+          caseUid={caseUid}
+          hideCaseContents={hideCaseContents}
+          isDisplaying={isDisplaying}
+          isSyncing={isSyncing}
+          items={items}
+          keyItem={keyItem}
+          neededKeyItem={neededKeyItem}
+          onClose={handleClose}
+          onUnlock={handleUnlock}
+        />
+      )}
+    </Overlay>,
+    document.body
   );
 }

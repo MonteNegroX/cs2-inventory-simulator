@@ -35,7 +35,8 @@ import { TranslationScript } from "./components/translation-script";
 import {
   ASSETS_BASE_URL,
   CLOUDFLARE_ANALYTICS_TOKEN,
-  SOURCE_COMMIT
+  SOURCE_COMMIT,
+  OPEN_CASE_MODE
 } from "./env.server";
 import { middleware } from "./http.server";
 import { getClientRules } from "./models/rule";
@@ -49,8 +50,7 @@ import styles from "./tailwind.css?url";
 import { nonEmptyString } from "./utils/misc";
 import { TonProvider } from "./TonProvider";
 import CustomInventory from "~/components/CustomInventory";
-import { WalletBalanceProvider } from "~/components/WalletBalanceContext"; // ✅ добавь импорт
-
+import { WalletBalanceProvider } from "~/components/WalletBalanceContext";
 
 const bodyFontUrl =
   "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,400..800;1,62.5..100,400..800&display=swap";
@@ -58,7 +58,6 @@ const bodyFontUrl =
 const displayFontUrl =
   "https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;600&display=swap";
 
-// Please consider donating :-(
 const displayFontIAmPayingFor = "https://use.typekit.net/ojo0ltc.css";
 
 export const links: LinksFunction = () => [
@@ -86,6 +85,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   const { origin: appUrl, host: appSiteName } = new URL(
     await steamCallbackUrl.get()
   );
+
   return data({
     rules: {
       ...(await getClientRules(user?.id)),
@@ -99,7 +99,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ...(await getLanguage(session, ipCountry)),
       ...(await getToggleable(session))
     },
-    user
+    user,
+
+    // ✅ ДОБАВЛЕНО: прокидываем VITE_OPEN_CASE_MODE в клиент
+    env: {
+    OPEN_CASE_MODE
+    }
   });
 }
 
@@ -146,13 +151,20 @@ export default function App() {
 
               <Outlet />
 
-              {/* ✅ ВСТАВЛЯЕМ КАСТОМНЫЙ ИНВЕНТАРЬ */}
               <CustomInventory />
 
               {footer && <Footer />}
               <SyncIndicator />
               <ScrollRestoration />
               <TranslationScript />
+
+              {/* ✅ ДОБАВЛЕНО: передаём ENV в window.ENV для клиента */}
+              <script
+                dangerouslySetInnerHTML={{
+                  __html: `window.ENV = ${JSON.stringify(appProps.ENV)}`
+                }}
+              />
+
               <CloudflareAnalyticsScript
                 token={appProps.rules.cloudflareAnalyticsToken}
               />

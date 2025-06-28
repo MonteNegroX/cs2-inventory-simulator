@@ -39,6 +39,9 @@ const AppContext = createContext<
     items: TransformedInventoryItems;
     setInventory: (value: CS2Inventory) => void;
     translation: ReturnType<typeof useTranslation>;
+    env: {
+      OPEN_CASE_MODE: string;
+    };
   } & SerializeFrom<typeof loader>
 >(null!);
 
@@ -79,12 +82,14 @@ export function AppProvider({
   children,
   preferences,
   rules,
-  user
+  user,
+  env // ✅ добавляем
 }: Omit<
   ContextType<typeof AppContext>,
   "inventory" | "inventoryFilter" | "items" | "translation" | "setInventory"
 > & {
   children: ReactNode;
+  env: { OPEN_CASE_MODE: string }; // ✅ добавляем типизацию env
 }) {
   const inventorySpec = {
     data: user?.inventory
@@ -95,6 +100,7 @@ export function AppProvider({
     maxItems: rules.inventoryMaxItems,
     storageUnitMaxItems: rules.inventoryStorageUnitMaxItems
   } satisfies Partial<CS2InventorySpec>;
+
   const [inventory, setInventory, reactSetInventory] = useInventoryState(
     () => new CS2Inventory(inventorySpec)
   );
@@ -133,20 +139,17 @@ export function AppProvider({
     }
   }, [user]);
 
-
   const items = useMemo(
     () =>
       (preferences.hideFilters
         ? sortItemsByEquipped
         : inventoryFilter.sortItems)(
-        // Inventory Items
         inventory.getAll().map((item) =>
           transform(item, {
             models: rules.inventoryItemEquipHideModel,
             types: rules.inventoryItemEquipHideType
           })
         ),
-        // Default Game Items
         getFreeItemsToDisplay(preferences.hideFreeItems)
       ),
     [
@@ -165,11 +168,12 @@ export function AppProvider({
         inventory,
         inventoryFilter,
         items,
-        translation: translation,
+        translation,
         preferences,
         rules,
         setInventory,
-        user
+        user,
+        env // ✅ добавляем в value для доступа из useAppContext
       }}
     >
       {children}

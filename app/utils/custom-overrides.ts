@@ -9,7 +9,7 @@ interface CustomOverride {
 export const CUSTOM_OVERRIDES: Record<number, CustomOverride> = {
     8471: {
         name: "LootBag",
-        image: "http://localhost:3007/images/lootbag.png",
+        image: "http://localhost:3000/images/lootbag.png",
     },
     9504: {
         contents: [8471, 8473, 8475, 8472], // ✅ пример кастомного содержимого кейса
