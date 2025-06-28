@@ -18,6 +18,5 @@ export const {
   STEAM_CALLBACK_URL
 } = process.env;
 export const USE_CUSTOM_ITEMS = process.env.USE_CUSTOM_ITEMS === "true";
-export const OPEN_CASE_MODE = ["SIMULATION", "CLASSIC"].includes(process.env.VITE_OPEN_CASE_MODE ?? "")
-  ? process.env.VITE_OPEN_CASE_MODE!
-  : "CLASSIC";
+export const OPEN_CASE_MODE = process.env.OPEN_CASE_MODE ?? "CLASSIC";
+console.log("✅ Server started with OPEN_CASE_MODE:", OPEN_CASE_MODE);
