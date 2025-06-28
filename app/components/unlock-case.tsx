@@ -80,7 +80,7 @@ export function UnlockCase({
   }
 
   async function handleUnlockSimulation() {
-    const openCount = 100;
+    const openCount = 1000;
     const results: Record<number, number> = {};
 
     for (let i = 0; i < openCount; i++) {
@@ -91,7 +91,7 @@ export function UnlockCase({
     const output = Object.entries(results)
       .map(([id, count]) => {
         const item = CS2Economy.getById(Number(id));
-        const percentage = ((count / openCount) * 1000).toFixed(2);
+        const percentage = ((count / openCount) * 100).toFixed(2);
         return `${item.name} (${item.rarity}): ${count} (${percentage}%)`;
       })
       .join("\n");
