@@ -31,9 +31,12 @@ import { InventoryItemContextMenu } from "./inventory-item-context-menu";
 import { InventoryItemTile } from "./inventory-item-tile";
 import { InventoryItemTooltip } from "./inventory-item-tooltip";
 import { alert, confirm } from "./modal-generic";
-import { useWalletBalance} from "~/components/WalletBalanceContext";
-import { CS2ItemType, CS2RarityColor }  from "@ianlucas/cs2-lib";
+import { useWalletBalance } from "~/components/WalletBalanceContext";
+import { CS2ItemType, CS2RarityColor } from "@ianlucas/cs2-lib";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
+
+// ✅ Импортируем хук для актуального floorData
+import { useFloorData } from "./hooks/use-floor-data";
 
 export function InventoryItem({
   disableContextMenu,
@@ -105,11 +108,49 @@ export function InventoryItem({
   const [inventory] = useInventory();
   const user = useUser();
   const { add } = useWalletBalance();
-  const dynamicPrice =
-    item.price ??
-    (item.type === CS2ItemType.Sticker && item.rarity === CS2RarityColor.Rare ? 1 : undefined);
   const overriddenItem = applyCustomOverrides(item);
 
+  // ✅ Получаем актуальные данные о floor
+  const { freshFloorData } = useFloorData();
+
+  // ✅ Константы для ID
+  const OVERRIDE_ITEM_ID = 8471;
+  const OVERRIDE_COLLECTION_ID = "EQCE80Aln8YfldnQLwWMvOfloLGgmPY0eGDJz9ufG3gRui3D";
+
+  // ✅ Правильный dynamicPrice
+  const dynamicPrice = (() => {
+    console.log("📊 freshFloorData:", freshFloorData);
+
+    const matchingFloor = Array.isArray(freshFloorData)
+        ? freshFloorData.find(fd => fd.collectionId === OVERRIDE_COLLECTION_ID)
+        : undefined;
+
+    console.log("📦 Найден matchingFloor:", matchingFloor);
+
+    if (
+        item.id === OVERRIDE_ITEM_ID &&
+        matchingFloor?.floorTon
+    ) {
+        const price = parseFloat(matchingFloor.floorTon);
+        console.log(
+            "✅ Применяем floorTon для item:",
+            item.id,
+            "Цена:",
+            price
+        );
+        return price;
+    }
+
+    const fallbackPrice =
+        item.price ??
+        (item.type === CS2ItemType.Sticker && item.rarity === CS2RarityColor.Rare ? 1 : undefined);
+
+    console.log("💰 Итог dynamicPrice для", item.id, "=", fallbackPrice);
+    return fallbackPrice;
+})();
+
+// ✅ Сюда:
+console.log("🔍 Проверка item.id:", item.id);
 
   const {
     clickContext,
@@ -207,10 +248,10 @@ export function InventoryItem({
       >
         <InventoryItemTile
           equipped={equipped}
-          item={overriddenItem}  // ✅ используем кастом
+          item={overriddenItem}
           onClick={
             canUnlockContainer
-              ? () => onUnlockContainer?.(uid) // сразу открыть кейс
+              ? () => onUnlockContainer?.(uid)
               : onClick !== undefined
                 ? close(() => onClick(uid))
                 : undefined
@@ -355,7 +396,6 @@ export function InventoryItem({
                           )
                         });
                       }
-
                       onInspectStorageUnit?.(uid);
                     })
                   }
@@ -401,9 +441,10 @@ export function InventoryItem({
                     condition: dynamicPrice !== undefined,
                     label: "Продать",
                     onClick: close(() => {
+                      console.log("💸 Продаём за:", dynamicPrice); // <<< добавить
                       add(dynamicPrice);
                       onRemove?.(uid);
-                      })
+                    })
                   },
                   {
                     condition: true,
@@ -433,7 +474,7 @@ export function InventoryItem({
             forwardRef={hoverRefs.setFloating}
             style={hoverStyles}
             {...getHoverFloatingProps()}
-            item={overriddenItem}  // ✅ используем кастом
+            item={overriddenItem}
           />
         </FloatingFocusManager>
       )}
