@@ -10,6 +10,8 @@ import { isServerContext } from "~/globals";
 import { getCDNUrl } from "~/utils/economy";
 import { noop } from "~/utils/misc";
 import { FillSpinner } from "./fill-spinner";
+import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
+
 
 let cached: string[] = [];
 
@@ -29,13 +31,15 @@ export function ItemImage({
   wear?: number;
 }) {
   type ??= "default";
-  const url = getCDNUrl(
-    type === "default"
-      ? item.getImage(wear)
-      : type === "collection"
-        ? item.getCollectionImage()
-        : item.getSpecialsImage()
-  );
+  let url =
+    CUSTOM_OVERRIDES[item.id]?.image ??
+    getCDNUrl(
+      type === "default"
+        ? item.getImage(wear)
+        : type === "collection"
+          ? item.getCollectionImage()
+          : item.getSpecialsImage()
+    );
   const [loaded, setLoaded] = useState(
     cached.includes(url) || url.includes("steamcommunity")
   );

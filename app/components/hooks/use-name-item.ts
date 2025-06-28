@@ -48,6 +48,7 @@ export function nameItemFactory(translate: ReturnType<typeof useTranslate>) {
     // Применяем кастомное имя, если указано
     const override = CUSTOM_OVERRIDES[item.id];
     const overriddenName = override?.name ?? item.name;
+    const overriddenImage = override?.image ?? item.image;
 
     let [model, ...names] = overriddenName.split("|").map((s) => s.trim());
     let name = names.join(" | ");

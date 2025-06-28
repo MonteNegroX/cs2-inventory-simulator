@@ -8,7 +8,7 @@ interface CustomOverride {
 export const CUSTOM_OVERRIDES: Record<number, CustomOverride> = {
     8471: {
         name: "ChatGPT Sticker",
-        image: "https://nft.fragment.com/gift/lootbag-1667.medium.jpg"
+        image: "http://localhost:3007/images/lootbag.png"
     },
     // Добавляй сюда другие кастомные предметы
 };
