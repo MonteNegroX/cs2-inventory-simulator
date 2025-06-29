@@ -35,9 +35,6 @@ import { useWalletBalance } from "~/components/WalletBalanceContext";
 import { CS2ItemType, CS2RarityColor } from "@ianlucas/cs2-lib";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
 
-// ✅ Импортируем хук для актуального floorData
-import { useFloorData } from "./hooks/use-floor-data";
-
 export function InventoryItem({
   disableContextMenu,
   disableHover,
@@ -108,49 +105,13 @@ export function InventoryItem({
   const [inventory] = useInventory();
   const user = useUser();
   const { add } = useWalletBalance();
+
+  // ✅ Применяем кастомные overrides, включая price из overrides.json
   const overriddenItem = applyCustomOverrides(item);
 
-  // ✅ Получаем актуальные данные о floor
-  const { freshFloorData } = useFloorData();
-
-  // ✅ Константы для ID
-  const OVERRIDE_ITEM_ID = 8471;
-  const OVERRIDE_COLLECTION_ID = "EQCE80Aln8YfldnQLwWMvOfloLGgmPY0eGDJz9ufG3gRui3D";
-
-  // ✅ Правильный dynamicPrice
-  const dynamicPrice = (() => {
-    console.log("📊 freshFloorData:", freshFloorData);
-
-    const matchingFloor = Array.isArray(freshFloorData)
-        ? freshFloorData.find(fd => fd.collectionId === OVERRIDE_COLLECTION_ID)
-        : undefined;
-
-    console.log("📦 Найден matchingFloor:", matchingFloor);
-
-    if (
-        item.id === OVERRIDE_ITEM_ID &&
-        matchingFloor?.floorTon
-    ) {
-        const price = parseFloat(matchingFloor.floorTon);
-        console.log(
-            "✅ Применяем floorTon для item:",
-            item.id,
-            "Цена:",
-            price
-        );
-        return price;
-    }
-
-    const fallbackPrice =
-        item.price ??
-        (item.type === CS2ItemType.Sticker && item.rarity === CS2RarityColor.Rare ? 1 : undefined);
-
-    console.log("💰 Итог dynamicPrice для", item.id, "=", fallbackPrice);
-    return fallbackPrice;
-})();
-
-// ✅ Сюда:
-console.log("🔍 Проверка item.id:", item.id);
+  // ✅ Берём price только из overrides.json
+  const dynamicPrice = overriddenItem.price ?? undefined;
+  console.log(`💰 dynamicPrice для item.id ${item.id} =`, dynamicPrice);
 
   const {
     clickContext,
@@ -253,8 +214,8 @@ console.log("🔍 Проверка item.id:", item.id);
             canUnlockContainer
               ? () => onUnlockContainer?.(uid)
               : onClick !== undefined
-                ? close(() => onClick(uid))
-                : undefined
+              ? close(() => onClick(uid))
+              : undefined
           }
         />
       </div>
@@ -403,8 +364,7 @@ console.log("🔍 Проверка item.id:", item.id);
                 [
                   {
                     condition:
-                      isStorageUnit &&
-                      inventory.canRetrieveFromStorageUnit(uid),
+                      isStorageUnit && inventory.canRetrieveFromStorageUnit(uid),
                     label: translate("InventoryItemStorageUnitRetrieve"),
                     onClick: close(() => onRetrieveFromStorageUnit?.(uid))
                   },
@@ -441,8 +401,8 @@ console.log("🔍 Проверка item.id:", item.id);
                     condition: dynamicPrice !== undefined,
                     label: "Продать",
                     onClick: close(() => {
-                      console.log("💸 Продаём за:", dynamicPrice); // <<< добавить
-                      add(dynamicPrice);
+                      console.log("💸 Продаём за:", dynamicPrice);
+                      add(Number(dynamicPrice));
                       onRemove?.(uid);
                     })
                   },

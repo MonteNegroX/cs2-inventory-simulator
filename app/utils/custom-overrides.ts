@@ -5,6 +5,7 @@ interface CustomOverride {
     name?: string;
     image?: string;
     contents?: number[];
+    price?: number[];
 }
 
 // Приведение ключей к числам для строгой типизации
@@ -20,6 +21,9 @@ export function applyCustomOverrides(item: CS2EconomyItem): CS2EconomyItem {
         }
         if (override.image) {
             item.image = override.image;
+        }
+        if (override.price) {
+            item.price = override.price;
         }
         if (override.contents) {
             console.log(`✅ Applying contents override to case ${item.id}`);

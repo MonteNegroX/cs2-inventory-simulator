@@ -1,304 +1,380 @@
 {
   "1859": {
     "name": "Hanging Star",
-    "image": "downloaded_webp/hangingstar.webp"
+    "image": "downloaded_webp/hangingstar.webp",
+    "price": "5.8"
   },
   "1860": {
     "name": "Sakura Flower",
-    "image": "downloaded_webp/sakuraflower.webp"
+    "image": "downloaded_webp/sakuraflower.webp",
+    "price": "5.2"
   },
   "1861": {
     "name": "Eternal Rose",
-    "image": "downloaded_webp/eternalrose.webp"
+    "image": "downloaded_webp/eternalrose.webp",
+    "price": "16.1"
   },
   "1862": {
     "name": "Bunny Muffin",
-    "image": "downloaded_webp/bunnymuffin.webp"
+    "image": "downloaded_webp/bunnymuffin.webp",
+    "price": "4.9"
   },
   "1863": {
     "name": "Snow Globe",
-    "image": "downloaded_webp/snowglobe.webp"
+    "image": "downloaded_webp/snowglobe.webp",
+    "price": "4.2"
   },
   "1864": {
     "name": "Berry Box",
-    "image": "downloaded_webp/berrybox.webp"
+    "image": "downloaded_webp/berrybox.webp",
+    "price": "5.7"
   },
   "1865": {
     "name": "Eternal Candle",
-    "image": "downloaded_webp/eternalcandle.webp"
+    "image": "downloaded_webp/eternalcandle.webp",
+    "price": "4.9"
   },
   "1866": {
     "name": "Voodoo Doll",
-    "image": "downloaded_webp/voodoodoll.webp"
+    "image": "downloaded_webp/voodoodoll.webp",
+    "price": "19.1"
   },
   "1867": {
-    "name": "Jelly Bunny"
+    "name": "Jelly Bunny",
+    "price": "4.2"
   },
   "1868": {
     "name": "Snow Mittens",
-    "image": "downloaded_webp/snowmittens.webp"
+    "image": "downloaded_webp/snowmittens.webp",
+    "price": "4.3"
   },
   "1869": {
     "name": "Tama Gadget",
-    "image": "downloaded_webp/tamagadget.webp"
+    "image": "downloaded_webp/tamagadget.webp",
+    "price": "2.9"
   },
   "1870": {
     "name": "Easter Egg",
-    "image": "downloaded_webp/easteregg.webp"
+    "image": "downloaded_webp/easteregg.webp",
+    "price": "3.7"
   },
   "1871": {
     "name": "Toy Bear",
-    "image": "downloaded_webp/toybear.webp"
+    "image": "downloaded_webp/toybear.webp",
+    "price": "24.0"
   },
   "1872": {
     "name": "Bonded Ring",
-    "image": "downloaded_webp/bondedring.webp"
+    "image": "downloaded_webp/bondedring.webp",
+    "price": "80.1"
   },
   "1873": {
     "name": "Magic Potion",
-    "image": "downloaded_webp/magicpotion.webp"
+    "image": "downloaded_webp/magicpotion.webp",
+    "price": "80.0"
   },
   "1874": {
     "name": "Diamond Ring",
-    "image": "downloaded_webp/diamondring.webp"
+    "image": "downloaded_webp/diamondring.webp",
+    "price": "18.5"
   },
   "1875": {
     "name": "Mad Pumpkin",
-    "image": "downloaded_webp/madpumpkin.webp"
+    "image": "downloaded_webp/madpumpkin.webp",
+    "price": "14.4"
   },
   "1876": {
     "name": "Love Candle",
-    "image": "downloaded_webp/lovecandle.webp"
+    "image": "downloaded_webp/lovecandle.webp",
+    "price": "10.5"
   },
   "1877": {
     "name": "Restless Jar",
-    "image": "downloaded_webp/restlessjar.webp"
+    "image": "downloaded_webp/restlessjar.webp",
+    "price": "4.1"
   },
   "1878": {
     "name": "Holiday Drink",
-    "image": "downloaded_webp/holidaydrink.webp"
+    "image": "downloaded_webp/holidaydrink.webp",
+    "price": "2.5"
   },
   "1879": {
     "name": "Big Year",
-    "image": "downloaded_webp/bigyear.webp"
+    "image": "downloaded_webp/bigyear.webp",
+    "price": "3.3"
   },
   "1880": {
     "name": "Scared Cat",
-    "image": "downloaded_webp/scaredcat.webp"
+    "image": "downloaded_webp/scaredcat.webp",
+    "price": "56.1"
   },
   "1881": {
     "name": "Light Sword",
-    "image": "downloaded_webp/lightsword.webp"
+    "image": "downloaded_webp/lightsword.webp",
+    "price": "4.3"
   },
   "1882": {
     "name": "Star Notepad",
-    "image": "downloaded_webp/starnotepad.webp"
+    "image": "downloaded_webp/starnotepad.webp",
+    "price": "3.7"
   },
   "1883": {
     "name": "Hex Pot",
-    "image": "downloaded_webp/hexpot.webp"
+    "image": "downloaded_webp/hexpot.webp",
+    "price": "3.6"
   },
   "1884": {
     "name": "Jack-in-the-Box",
-    "image": "downloaded_webp/jackinthebox.webp"
+    "image": "downloaded_webp/jackinthebox.webp",
+    "price": "2.9"
   },
   "1885": {
     "name": "Sleigh Bell",
-    "image": "downloaded_webp/sleighbell.webp"
+    "image": "downloaded_webp/sleighbell.webp",
+    "price": "10.4"
   },
   "1886": {
     "name": "Evil Eye",
-    "image": "downloaded_webp/evileye.webp"
+    "image": "downloaded_webp/evileye.webp",
+    "price": "4.0"
   },
   "1887": {
     "name": "Witch Hat",
-    "image": "downloaded_webp/witchhat.webp"
+    "image": "downloaded_webp/witchhat.webp",
+    "price": "3.8"
   },
   "1888": {
     "name": "Sharp Tongue",
-    "image": "downloaded_webp/sharptongue.webp"
+    "image": "downloaded_webp/sharptongue.webp",
+    "price": "44.0"
   },
   "1889": {
     "name": "Ginger Cookie",
-    "image": "downloaded_webp/gingercookie.webp"
+    "image": "downloaded_webp/gingercookie.webp",
+    "price": "2.6"
   },
   "1890": {
     "name": "Winter Wreath",
-    "image": "downloaded_webp/winterwreath.webp"
+    "image": "downloaded_webp/winterwreath.webp",
+    "price": "2.6"
   },
   "1891": {
     "name": "Skull Flower",
-    "image": "downloaded_webp/skullflower.webp"
+    "image": "downloaded_webp/skullflower.webp",
+    "price": "10.4"
   },
   "1892": {
     "name": "Pet Snake",
-    "image": "downloaded_webp/petsnake.webp"
+    "image": "downloaded_webp/petsnake.webp",
+    "price": "2.4"
   },
   "1893": {
     "name": "Top Hat",
-    "image": "downloaded_webp/tophat.webp"
+    "image": "downloaded_webp/tophat.webp",
+    "price": "11.3"
   },
   "1894": {
     "name": "Spy Agaric",
-    "image": "downloaded_webp/spyagaric.webp"
+    "image": "downloaded_webp/spyagaric.webp",
+    "price": "3.2"
   },
   "1895": {
     "name": "Crystal Ball",
-    "image": "downloaded_webp/crystalball.webp"
+    "image": "downloaded_webp/crystalball.webp",
+    "price": "9.3"
   },
   "1896": {
     "name": "Jester Hat",
-    "image": "downloaded_webp/jesterhat.webp"
+    "image": "downloaded_webp/jesterhat.webp",
+    "price": "2.1"
   },
   "1897": {
     "name": "Trapped Heart",
-    "image": "downloaded_webp/trappedheart.webp"
+    "image": "downloaded_webp/trappedheart.webp",
+    "price": "9.9"
   },
   "1898": {
     "name": "Spiced Wine",
-    "image": "downloaded_webp/spicedwine.webp"
+    "image": "downloaded_webp/spicedwine.webp",
+    "price": "3.0"
   },
   "1899": {
     "name": "Record Player",
-    "image": "downloaded_webp/recordplayer.webp"
+    "image": "downloaded_webp/recordplayer.webp",
+    "price": "11.0"
   },
   "1900": {
     "name": "Cookie Heart",
-    "image": "downloaded_webp/cookieheart.webp"
+    "image": "downloaded_webp/cookieheart.webp",
+    "price": "2.3"
   },
   "1901": {
     "name": "Flying Broom",
-    "image": "downloaded_webp/flyingbroom.webp"
+    "image": "downloaded_webp/flyingbroom.webp",
+    "price": "9.7"
   },
   "1902": {
     "name": "Hypno Lollipop",
-    "image": "downloaded_webp/hypnolollipop.webp"
+    "image": "downloaded_webp/hypnolollipop.webp",
+    "price": "2.3"
   },
   "1903": {
     "name": "Love Potion",
-    "image": "downloaded_webp/lovepotion.webp"
+    "image": "downloaded_webp/lovepotion.webp",
+    "price": "10.4"
   },
   "1904": {
     "name": "Santa Hat",
-    "image": "downloaded_webp/santahat.webp"
+    "image": "downloaded_webp/santahat.webp",
+    "price": "3.1"
   },
   "1905": {
     "name": "Bow Tie",
-    "image": "downloaded_webp/bowtie.webp"
+    "image": "downloaded_webp/bowtie.webp",
+    "price": "6.0"
   },
   "1906": {
     "name": "Jingle Bells",
-    "image": "downloaded_webp/jinglebells.webp"
+    "image": "downloaded_webp/jinglebells.webp",
+    "price": "2.3"
   },
   "1908": {
     "name": "Candy Cane",
-    "image": "downloaded_webp/candycane.webp"
+    "image": "downloaded_webp/candycane.webp",
+    "price": "2.1"
   },
   "1910": {
     "name": "Lunar Snake",
-    "image": "downloaded_webp/lunarsnake.webp"
+    "image": "downloaded_webp/lunarsnake.webp",
+    "price": "2.0"
   },
   "1912": {
     "name": "Snake Box",
-    "image": "downloaded_webp/snakebox.webp"
+    "image": "downloaded_webp/snakebox.webp",
+    "price": "2.1"
   },
   "1914": {
     "name": "Xmas Stocking",
-    "image": "downloaded_webp/xmasstocking.webp"
+    "image": "downloaded_webp/xmasstocking.webp",
+    "price": "2.1"
   },
   "1916": {
     "name": "Party Sparkler",
-    "image": "downloaded_webp/partysparkler.webp"
+    "image": "downloaded_webp/partysparkler.webp",
+    "price": "2.6"
   },
   "1918": {
     "name": "Desk Calendar",
-    "image": "downloaded_webp/deskcalendar.webp"
+    "image": "downloaded_webp/deskcalendar.webp",
+    "price": "1.8"
   },
   "1920": {
     "name": "B-Day Candle",
-    "image": "downloaded_webp/bdaycandle.webp"
+    "image": "downloaded_webp/bdaycandle.webp",
+    "price": "2.0"
   },
   "1922": {
     "name": "Swiss Watch",
-    "image": "downloaded_webp/swisswatch.webp"
+    "image": "downloaded_webp/swisswatch.webp",
+    "price": "43.2"
   },
   "1923": {
     "name": "Kissed Frog",
-    "image": "downloaded_webp/kissedfrog.webp"
+    "image": "downloaded_webp/kissedfrog.webp",
+    "price": "40.5"
   },
   "1924": {
     "name": "Electric Skull",
-    "image": "downloaded_webp/electricskull.webp"
+    "image": "downloaded_webp/electricskull.webp",
+    "price": "37.0"
   },
   "1925": {
     "name": "Signet Ring",
-    "image": "downloaded_webp/signetring.webp"
+    "image": "downloaded_webp/signetring.webp",
+    "price": "31.9"
   },
   "1926": {
     "name": "Vintage Cigar",
-    "image": "downloaded_webp/vintagecigar.webp"
+    "image": "downloaded_webp/vintagecigar.webp",
+    "price": "36.4"
   },
   "1927": {
     "name": "Neko Helmet",
-    "image": "downloaded_webp/nekohelmet.webp"
+    "image": "downloaded_webp/nekohelmet.webp",
+    "price": "35.0"
   },
   "1942": {
     "name": "Homemade Cake",
-    "image": "downloaded_webp/homemadecake.webp"
+    "image": "downloaded_webp/homemadecake.webp",
+    "price": "1.8"
   },
   "1943": {
     "name": "Lol Pop",
-    "image": "downloaded_webp/lolpop.webp"
+    "image": "downloaded_webp/lolpop.webp",
+    "price": "1.8"
   },
   "3834": {
     "name": "Plush Pepe",
-    "image": "downloaded_webp/plushpepe.webp"
+    "image": "downloaded_webp/plushpepe.webp",
+    "price": "3954.1"
   },
   "3837": {
     "name": "Heart Locket",
-    "image": "downloaded_webp/heartlocket.webp"
+    "image": "downloaded_webp/heartlocket.webp",
+    "price": "1621.7"
   },
   "3840": {
-    "name": "Durov's Cap"
+    "name": "Durov's Cap",
+    "price": "695.8"
   },
   "3843": {
     "name": "Precious Peach",
-    "image": "downloaded_webp/preciouspeach.webp"
+    "image": "downloaded_webp/preciouspeach.webp",
+    "price": "399.5"
   },
   "3846": {
     "name": "Heroic Helmet",
-    "image": "downloaded_webp/heroichelmet.webp"
+    "image": "downloaded_webp/heroichelmet.webp",
+    "price": "291.5"
   },
   "3849": {
     "name": "Nail Bracelet",
-    "image": "downloaded_webp/nailbracelet.webp"
+    "image": "downloaded_webp/nailbracelet.webp",
+    "price": "158.4"
   },
   "3852": {
     "name": "Gem Signet",
-    "image": "downloaded_webp/gemsignet.webp"
+    "image": "downloaded_webp/gemsignet.webp",
+    "price": "104.1"
   },
   "3855": {
     "name": "Mini Oscar",
-    "image": "downloaded_webp/minioscar.webp"
+    "image": "downloaded_webp/minioscar.webp",
+    "price": "97.9"
   },
   "3858": {
     "name": "Ion Gem",
-    "image": "downloaded_webp/iongem.webp"
+    "image": "downloaded_webp/iongem.webp",
+    "price": "97.9"
   },
   "3861": {
     "name": "Perfume",
-    "image": "downloaded_webp/perfumebottle.webp"
+    "image": "downloaded_webp/perfumebottle.webp",
+    "price": "93.7"
   },
   "3864": {
     "name": "Loot Bag",
-    "image": "downloaded_webp/lootbag.webp"
+    "image": "downloaded_webp/lootbag.webp",
+    "price": "109.3"
   },
   "3867": {
     "name": "Astral Shard",
-    "image": "downloaded_webp/astralshard.webp"
+    "image": "downloaded_webp/astralshard.webp",
+    "price": "101.1"
   },
   "6085": {
     "name": "Genie Lamp",
-    "image": "downloaded_webp/genielamp.webp"
+    "image": "downloaded_webp/genielamp.webp",
+    "price": "60.4"
   }
 }
