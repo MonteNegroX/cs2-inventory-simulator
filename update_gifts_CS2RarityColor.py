@@ -49,13 +49,11 @@ print(f"\n📊 Границы по актуальным ценам TON:")
 print(f"   p50 (Rare/Mythical): {p50:.1f} TON")
 print(f"   p70 (Mythical/Legendary): {p70:.1f} TON")
 print(f"   p85 (Legendary/Ancient): {p85:.1f} TON")
-print(f"   p95 (Ancient/Immortal): {p95:.1f} TON\n")
+print(f"   p95 (Ancient/верх): {p95:.1f} TON\n")
 
-# 6️⃣ Присвоение категории
+# 6️⃣ Присвоение категории (без Immortal)
 def determine_rarity_dynamic(floor_ton, p50, p70, p85, p95):
-    if floor_ton >= p95:
-        return 'Immortal'
-    elif floor_ton >= p85:
+    if floor_ton >= p85:
         return 'Ancient'
     elif floor_ton >= p70:
         return 'Legendary'
@@ -95,7 +93,7 @@ print(f"✅ Создана копия: {actual_name}")
 print("\n📊 Статистика распределения с диапазоном цен:")
 total = sum(rarity_counter.values())
 
-for rarity in ['Rare', 'Mythical', 'Legendary', 'Ancient', 'Immortal']:
+for rarity in ['Rare', 'Mythical', 'Legendary', 'Ancient']:
     count = rarity_counter[rarity]
     if rarity_prices[rarity]:
         min_price = min(rarity_prices[rarity])
