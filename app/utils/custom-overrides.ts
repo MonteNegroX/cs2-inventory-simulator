@@ -1,21 +1,16 @@
+import rawOverrides from "../../overrides.json";
 import { CS2EconomyItem } from "@ianlucas/cs2-lib";
 
 interface CustomOverride {
     name?: string;
     image?: string;
-    contents?: number[]; // ✅ добавляем поле для override contents
+    contents?: number[];
 }
 
-export const CUSTOM_OVERRIDES: Record<number, CustomOverride> = {
-    8471: {
-        name: "LootBag",
-        image: "http://localhost:3000/images/lootbag.png",
-    },
-    9504: {
-        contents: [8471, 7308], // ✅ пример кастомного содержимого кейса
-    },
-    // Добавляй сюда другие кастомные предметы
-};
+// Приведение ключей к числам для строгой типизации
+export const CUSTOM_OVERRIDES: Record<number, CustomOverride> = Object.fromEntries(
+    Object.entries(rawOverrides).map(([key, value]) => [Number(key), value])
+);
 
 export function applyCustomOverrides(item: CS2EconomyItem): CS2EconomyItem {
     const override = CUSTOM_OVERRIDES[item.id];
@@ -26,7 +21,7 @@ export function applyCustomOverrides(item: CS2EconomyItem): CS2EconomyItem {
         if (override.image) {
             item.image = override.image;
         }
-        if (override.contents && item.contents) { // ✅ проверяем что это контейнер
+        if (override.contents) {
             console.log(`✅ Applying contents override to case ${item.id}`);
             item.contents = override.contents;
         }
