@@ -91,9 +91,11 @@ export function UnlockCase({
     const output = Object.entries(results)
       .map(([id, count]) => {
         const item = CS2Economy.getById(Number(id));
-        const percentage = ((count / openCount) * 100).toFixed(2);
-        return `${item.name} (${item.rarity}): ${count} (${percentage}%)`;
+        const percentage = ((count / openCount) * 100);
+        return { text: `${item.name} (${item.rarity}): ${count} (${percentage.toFixed(2)}%)`, percentage };
       })
+      .sort((a, b) => b.percentage - a.percentage) // сортировка по убыванию
+      .map(entry => entry.text)
       .join("\n");
 
     console.log("🔹 Статистика по 1000 открытиям кейса:");

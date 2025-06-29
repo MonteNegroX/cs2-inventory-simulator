@@ -12,7 +12,7 @@ export const CUSTOM_OVERRIDES: Record<number, CustomOverride> = {
         image: "http://localhost:3000/images/lootbag.png",
     },
     9504: {
-        contents: [8471, 8473, 8475, 8472], // ✅ пример кастомного содержимого кейса
+        contents: [8471, 7308], // ✅ пример кастомного содержимого кейса
     },
     // Добавляй сюда другие кастомные предметы
 };

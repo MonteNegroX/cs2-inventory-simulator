@@ -10,25 +10,27 @@ if (!url) {
 
 (async () => {
     const browser = await puppeteer.launch({
-        headless: "new", // Chromium без UI
+        headless: "new",
         args: ["--no-sandbox", "--disable-setuid-sandbox"]
     });
 
     const page = await browser.newPage();
 
-    console.log("🌐 Загружаем страницу:", url);
-    await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
+    try {
+        await page.goto(url, { waitUntil: "networkidle2", timeout: 60000 });
 
-    const selector = "#main_container > main > section.tm-section.clearfix.mb-2 > div.table-responsive > table > tbody > tr > td:nth-child(2) > div > div";
+        const selector = "#main_container > main > section.tm-section.clearfix.mb-2 > div.table-responsive > table > tbody > tr > td:nth-child(2) > div > div";
 
-    console.log("🔍 Ожидание появления элемента с floor price...");
-    await page.waitForSelector(selector, { timeout: 30000 });
+        await page.waitForSelector(selector, { timeout: 30000 });
 
-    const floorPrice = await page.$eval(selector, el =>
-        el.textContent.trim().replace(/[^\d.]/g, "")
-    );
+        const floorPrice = await page.$eval(selector, el =>
+            el.textContent.trim().replace(/[^\d.]/g, "")
+        );
 
-    console.log("✅ Floor price найден:", floorPrice);
-
-    await browser.close();
+        console.log(floorPrice); // только floor price для парсера
+    } catch (e) {
+        console.log(""); // если не найден, выводим пустую строку
+    } finally {
+        await browser.close();
+    }
 })();
