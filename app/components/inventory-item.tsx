@@ -221,25 +221,39 @@ export function InventoryItem({
     {...getHoverReferenceProps(getClickReferenceProps())}
   >
     {animationPath ? (
-      <Lottie
-        animationData={lottieData}
-        loop={false}
-        autoplay
-        style={{ width: "80%", height: "80%" }}
-      />
-    ) : (
-      <InventoryItemTile
-        equipped={equipped}
-        item={overriddenItem}
-        onClick={
-          canUnlockContainer
-            ? () => onUnlockContainer?.(uid)
-            : onClick !== undefined
-            ? close(() => onClick(uid))
-            : undefined
-        }
-      />
+  <div className="relative w-full h-full flex items-center justify-center">
+    <Lottie
+      animationData={lottieData}
+      loop={false}
+      autoplay
+      style={{ width: "80%", height: "80%" }}
+    />
+    {/* Название */}
+    <div className="absolute bottom-0 w-full text-center text-xs text-white bg-black/50 backdrop-blur-sm px-1">
+      {overriddenItem.name}
+    </div>
+    {/* Цена */}
+    {dynamicPrice !== undefined && (
+      <div className="absolute top-0 right-0 m-1 flex items-center gap-1 rounded bg-black/50 px-1 py-0.5 text-[10px] text-white backdrop-blur-sm">
+        💎
+        {Number(dynamicPrice).toLocaleString()}
+      </div>
     )}
+  </div>
+) : (
+  <InventoryItemTile
+    equipped={equipped}
+    item={overriddenItem}
+    onClick={
+      canUnlockContainer
+        ? () => onUnlockContainer?.(uid)
+        : onClick !== undefined
+        ? close(() => onClick(uid))
+        : undefined
+    }
+  />
+)}
+
   </div>
       {!isFreeInventoryItem && !disableContextMenu && isClickOpen && (
         <FloatingFocusManager context={clickContext} modal={false}>
