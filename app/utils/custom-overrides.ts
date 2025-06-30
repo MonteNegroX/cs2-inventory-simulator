@@ -23,8 +23,9 @@ export function applyCustomOverrides(item: CS2EconomyItem): CS2EconomyItem {
             item.image = override.image;
         }
         if (override.price) {
-            item.price = override.price;
-        }
+          const p = parseFloat(override.price);
+          if (!isNaN(p)) item.price = p;
+          }
         if (override.contents) {
             console.log(`✅ Applying contents override to case ${item.id}`);
             item.contents = override.contents;

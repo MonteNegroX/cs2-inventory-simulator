@@ -13,7 +13,6 @@ import clsx from "clsx";
 import { ComponentProps } from "react";
 import { has } from "~/utils/misc";
 import { usePreferences } from "./app-context";
-import { InventoryItemTooltipContents } from "./inventory-item-tooltip-contents";
 import { InventoryItemTooltipExterior } from "./inventory-item-tooltip-exterior";
 import { InventoryItemTooltipName } from "./inventory-item-tooltip-name";
 import { InventoryItemTooltipRarity } from "./inventory-item-tooltip-rarity";
@@ -36,16 +35,12 @@ export function InventoryItemTooltip({
     item.containerId !== undefined
       ? CS2Economy.getById(item.containerId)
       : item;
-  const hasContents = containerItem.isContainer();
   const hasWear = !item.free && item.hasWear();
   const hasSeed = !item.free && item.hasSeed();
   const hasAttributes = hasWear || hasSeed;
   const hasStatTrak = item.statTrak !== undefined;
   const wear = item.getWear();
 
-  // We don't treat graffiti as equippable for a particular team, but in-game it
-  // shows as CT or T, if we were to change cs2-lib it would be a breaking
-  // change for graffiti logic, so we just update here.
   const teams =
     item.type === CS2ItemType.Graffiti ? CS2_TEAMS_BOTH : item.teams;
   const hasTeams = teams !== undefined;
@@ -93,12 +88,7 @@ export function InventoryItemTooltip({
           {itemDescription}
         </p>
       )}
-      {hasContents && (
-        <InventoryItemTooltipContents
-          containerItem={containerItem}
-          unlockedItem={!isContainer ? item : undefined}
-        />
-      )}
+      {/* InventoryItemTooltipContents отключен */}
       {statsForNerds && hasAttributes && (
         <div className="mt-2 flex flex-col gap-2">
           {hasWear && <InventoryItemTooltipWear wear={wear} />}

@@ -9,7 +9,7 @@ export default function ProfilePage() {
   };
 
   const handleResetFunds = () => {
-    add(-balance); // сброс до 0
+    add(-Number(balance) || 0); // сброс до 0
   };
 
   return (
@@ -17,7 +17,10 @@ export default function ProfilePage() {
       <h1 className="text-2xl font-bold">👤 Профиль</h1>
 
       <div className="text-lg">
-        Ваш баланс: <span className="font-mono">{balance.toFixed(2)} TON</span>
+        Ваш баланс:{" "}
+        <span className="font-mono">
+          {typeof balance === "number" ? balance.toFixed(2) : "0.00"} TON
+        </span>
       </div>
 
       <button

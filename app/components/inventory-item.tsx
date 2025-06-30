@@ -402,7 +402,12 @@ export function InventoryItem({
                     label: "Продать",
                     onClick: close(() => {
                       console.log("💸 Продаём за:", dynamicPrice);
-                      add(Number(dynamicPrice));
+                      const priceToAdd = Number(dynamicPrice);
+                      if (!isNaN(priceToAdd) && priceToAdd > 0) {
+                      add(priceToAdd);
+                      } else {
+                        console.warn("❌ dynamicPrice is not a valid number:", dynamicPrice);
+                      }
                       onRemove?.(uid);
                     })
                   },

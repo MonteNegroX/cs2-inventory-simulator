@@ -46,7 +46,7 @@ export function UnlockCaseContainer({
   const translate = useTranslate();
   const nameItemString = useNameItemString();
   const needsToAddKey = keyItem === undefined && neededKeyItem !== undefined;
-  const CASE_PRICE = 1;
+  const CASE_PRICE = 2;
   const { balance, deduct } = useWalletBalance();
 
   function handlePaidUnlock() {

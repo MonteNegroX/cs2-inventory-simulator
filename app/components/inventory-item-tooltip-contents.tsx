@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { CS2EconomyItem } from "@ianlucas/cs2-lib";
 import { useNameItemString } from "~/components/hooks/use-name-item";
 import { useTranslate } from "./app-context";
+import { applyCustomOverrides } from "~/utils/custom-overrides";
 
 export function InventoryItemTooltipContents({
   containerItem: item,
@@ -19,6 +20,8 @@ export function InventoryItemTooltipContents({
   const translate = useTranslate();
   const nameItemString = useNameItemString();
 
+  const contents = item.listContents ? item.listContents(true) : [];
+
   return (
     <div className="mt-4">
       <div className="text-neutral-400">
@@ -26,27 +29,37 @@ export function InventoryItemTooltipContents({
           ? translate("InventoryItemContainsOne")
           : unlockedItem.collectionName}
       </div>
-      {item.listContents(true).map((item) => (
-        <div
-          className="flex items-center gap-1"
-          key={item.id}
-          style={{ color: item.rarity }}
-        >
-          {unlockedItem !== undefined && (
-            <div className="w-[16px] text-right">
-              {item.id === unlockedItem.id && (
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  className="h-3 text-neutral-500"
-                />
-              )}
+      {Array.isArray(contents) && contents.length > 0 ? contents.map((rawItem) => {
+        const item = applyCustomOverrides(rawItem);
+        return (
+          <div
+            className="flex items-center gap-1"
+            key={item.id}
+            style={{ color: item.rarity }}
+          >
+            {unlockedItem !== undefined && (
+              <div className="w-[16px] text-right">
+                {item.id === unlockedItem.id && (
+                  <FontAwesomeIcon
+                    icon={faCheck}
+                    className="h-3 text-neutral-500"
+                  />
+                )}
+              </div>
+            )}
+            <div className="flex-1">
+              {nameItemString(item, "case-contents-name")}
             </div>
-          )}
-          <div className="flex-1">
-            {nameItemString(item, "case-contents-name")}
+            {typeof item.price === "number" && !isNaN(item.price) && (
+              <div className="text-xs text-neutral-400">
+                {item.price.toFixed(2)} TON
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        );
+      }) : (
+        <div className="text-neutral-400">Нет содержимого</div>
+      )}
       {item.specials !== undefined && (
         <div className="text-yellow-300">
           {translate("InventoryItemRareItem")}

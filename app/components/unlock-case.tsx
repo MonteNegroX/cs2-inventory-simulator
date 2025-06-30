@@ -17,6 +17,7 @@ import { useIsSyncing } from "./hooks/use-sync-state";
 import { Overlay } from "./overlay";
 import { UnlockCaseContainer } from "./unlock-case-container";
 import { UnlockCaseContainerUnlocked } from "./unlock-case-container-unlocked";
+import { applyCustomOverrides } from "~/utils/custom-overrides";
 
 export function UnlockCase({
   caseUid,
@@ -80,27 +81,53 @@ export function UnlockCase({
   }
 
   async function handleUnlockSimulation() {
-    const openCount = 1000;
+    const openCount = 10000;
     const results: Record<number, number> = {};
+    let totalValue = 0;
 
+    // 1) Собираем статистику
     for (let i = 0; i < openCount; i++) {
-      const unlockedItem = caseItem.unlockContainer();
-      results[unlockedItem.id] = (results[unlockedItem.id] || 0) + 1;
+        const unlocked = caseItem.unlockContainer();
+        results[unlocked.id] = (results[unlocked.id] || 0) + 1;
+
+        // применяем оверрайд и сразу берём price как число
+        const econItem    = CS2Economy.getById(unlocked.id);
+        const overridden  = applyCustomOverrides({ ...econItem });
+        const priceTon    = overridden.price || 0;
+
+        totalValue += priceTon;
     }
 
-    const output = Object.entries(results)
-      .map(([id, count]) => {
-        const item = CS2Economy.getById(Number(id));
-        const percentage = ((count / openCount) * 100);
-        return { text: `${item.name} (${item.rarity}): ${count} (${percentage.toFixed(2)}%)`, percentage };
-      })
-      .sort((a, b) => b.percentage - a.percentage) // сортировка по убыванию
-      .map(entry => entry.text)
-      .join("\n");
+    // 2) Формируем вывод
+    const breakdown = Object.entries(results)
+        .map(([idStr, count]) => {
+            const id         = Number(idStr);
+            const econItem   = CS2Economy.getById(id);
+            const overridden = applyCustomOverrides({ ...econItem });
+            const perc       = (count / openCount) * 100;
+            const priceTon   = overridden.price || 0;
+            const value      = count * priceTon;
 
-    console.log("🔹 Статистика по 1000 открытиям кейса:");
-    console.log(output);
-    alert("✅ Имитация 1000 открытий завершена. Смотри консоль для статистики.");
+            return {
+                text: `${overridden.name} (${overridden.rarity}): ${count} (${perc.toFixed(2)}%) — ${value.toFixed(2)} TON`,
+                perc
+            };
+        })
+        .sort((a, b) => b.perc - a.perc)
+        .map(e => e.text)
+        .join("\n");
+
+    const spent     = 20000; // 1 TON за кейс
+    const earned    = totalValue;
+    const houseEdge = ((1 - earned / spent) * 100).toFixed(2);
+
+    console.log("🔹 Статистика по 10 000 открытиям кейса:");
+    console.log(breakdown);
+    console.log(`💰 Потрачено: ${spent} TON`);
+    console.log(`💎 Получено: ${earned.toFixed(2)} TON`);
+    console.log(`🏠 House Edge: ${houseEdge}%`);
+
+    alert("✅ Имитация завершена. Смотри консоль.");
   }
 
   const handleUnlock = OPEN_CASE_MODE === "SIMULATION"

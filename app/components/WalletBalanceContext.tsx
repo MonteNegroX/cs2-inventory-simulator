@@ -29,7 +29,7 @@ export const WalletBalanceProvider = ({ children }: { children: React.ReactNode 
   );
 };
 
-export const useWalletBalance = () => {
+export const  useWalletBalance = () => {
   const ctx = useContext(WalletBalanceContext);
   if (!ctx) throw new Error("useWalletBalance must be used within WalletBalanceProvider");
   return ctx;
