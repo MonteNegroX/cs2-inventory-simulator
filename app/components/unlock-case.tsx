@@ -37,6 +37,7 @@ export function UnlockCase({
   const [isDisplaying, setIsDisplaying] = useState(false);
   const [canUnlock, setCanUnlock] = useState(true);
   const [unlockedItem, setUnlockedItem] = useState<CS2UnlockedItem>();
+
   const [hideCaseContents, setHideCaseContents] = useState(false);
   const unlockedItemRef = useRef<CS2UnlockedItem>(undefined);
 
@@ -50,9 +51,13 @@ export function UnlockCase({
     const unlockedItem = unlockedItemRef.current;
     if (!unlockedItem) return;
     setUnlockedItem(unlockedItem);
-    setInventory(inventory.unlockContainer(unlockedItem, caseUid, keyUid));
+    setInventory(prev => {
+        let updated = prev.unlockContainer(unlockedItem, caseUid, keyUid);
+        updated = updated.addContainer(caseItem); // добавляем дубль кейса
+        return updated;
+    });
     unlockedItemRef.current = undefined;
-  }
+}
 
   function handleClose() {
     addUnlockedItemToInventory();
