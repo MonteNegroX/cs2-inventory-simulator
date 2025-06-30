@@ -223,9 +223,9 @@ export function InventoryItem({
     {animationPath ? (
       <Lottie
         animationData={lottieData}
-        loop
+        loop={false}
         autoplay
-        style={{ width: "100%", height: "100%" }}
+        style={{ width: "80%", height: "80%" }}
       />
     ) : (
       <InventoryItemTile
