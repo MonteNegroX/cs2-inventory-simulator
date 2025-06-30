@@ -19,6 +19,8 @@ import {
 } from "react-router";
 
 import { AppProvider } from "./components/app-context";
+import PatternSVGBackground from "./components/background-pattern";
+import PatternCard  from "./components/PatternCard"
 import { Background } from "./components/background";
 import { CloudflareAnalyticsScript } from "./components/cloudflare-analytics-script";
 import { Console } from "./components/console";
@@ -132,44 +134,53 @@ export default function App() {
         ))}
       </head>
       <body className="overflow-y-scroll bg-stone-800">
-        <AppProvider {...appProps}>
-          <WalletBalanceProvider>
-            <TonProvider>
-              <Splash />
-              <Background />
-              <Console />
-              <SyncWarn />
-              {(header || inventory) && (
-                <ItemSelectorProvider>
-                  {header && <Header showInventoryFilter={inventory} />}
-                  {inventory && <Inventory />}
-                </ItemSelectorProvider>
-              )}
+  <AppProvider {...appProps}>
+    <WalletBalanceProvider>
+      <TonProvider>
+        {/* ✅ Паттерн ФОН, фиксированный на весь экран */}
+        <div className="fixed inset-0 -z-10">
+          <PatternCard />
+        </div>
 
-              <Outlet />
+        {/* ✅ Весь остальной контент поверх */}
+        <div className="relative z-10 min-h-screen flex flex-col">
+          <Splash />
+          <Console />
+          <SyncWarn />
 
-              <CustomInventory />
+          {(header || inventory) && (
+            <ItemSelectorProvider>
+              {header && <Header showInventoryFilter={inventory} />}
+              {inventory && <Inventory />}
+            </ItemSelectorProvider>
+          )}
 
-              {footer && <Footer />}
-              <SyncIndicator />
-              <ScrollRestoration />
-              <TranslationScript />
+          <Outlet />
 
-              {/* ✅ ДОБАВЛЕНО: передаём ENV в window.ENV для клиента */}
-              <script
-                dangerouslySetInnerHTML={{
-                  __html: `window.ENV = ${JSON.stringify(appProps.ENV)}`
-                }}
-              />
+          <CustomInventory />
 
-              <CloudflareAnalyticsScript
-                token={appProps.rules.cloudflareAnalyticsToken}
-              />
-              <Scripts />
-            </TonProvider>
-          </WalletBalanceProvider>
-        </AppProvider>
-      </body>
+          {footer && <Footer />}
+          <SyncIndicator />
+          <ScrollRestoration />
+          <TranslationScript />
+
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.ENV = ${JSON.stringify(appProps.ENV)}`
+            }}
+          />
+
+          <CloudflareAnalyticsScript
+            token={appProps.rules.cloudflareAnalyticsToken}
+          />
+          <Scripts />
+        </div>
+      </TonProvider>
+    </WalletBalanceProvider>
+  </AppProvider>
+</body>
+
+
     </html>
   );
 }
