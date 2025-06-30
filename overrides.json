@@ -1,6 +1,7 @@
 {
   "9504": {
     "contents": [
+      3837,
   1918,
   1920,
   1942,
@@ -328,6 +329,7 @@
   },
   "3837": {
     "name": "Heart Locket",
+    "animation": "/lottie/durovscap-2357.lottie.json",
     "image": "downloaded_webp/heartlocket.webp",
     "price": "1621.7"
   },

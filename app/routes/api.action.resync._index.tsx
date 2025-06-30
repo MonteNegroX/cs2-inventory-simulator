@@ -4,7 +4,6 @@
  *--------------------------------------------------------------------------------------------*/
 
 import { api } from "~/api.server";
-import { requireUser } from "~/auth.server";
 import { middleware } from "~/http.server";
 import type { Route } from "./+types/api.action.resync._index";
 

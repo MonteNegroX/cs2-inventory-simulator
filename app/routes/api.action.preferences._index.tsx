@@ -6,7 +6,6 @@
 import { redirect } from "react-router";
 import { z } from "zod";
 import { api } from "~/api.server";
-import { getRequestUserId } from "~/auth.server";
 import { middleware } from "~/http.server";
 import {
   getUserPreferences,

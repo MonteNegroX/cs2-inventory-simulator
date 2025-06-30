@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 
-import { authenticator } from "~/auth.server";
 import { middleware } from "~/http.server";
 import type { Route } from "./+types/sign-in._index";
 

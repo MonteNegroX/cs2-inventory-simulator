@@ -5,7 +5,6 @@
 
 import { redirect } from "react-router";
 import { api } from "~/api.server";
-import { authenticator } from "~/auth.server";
 import { middleware } from "~/http.server";
 import { commitSession, getSession } from "~/session.server";
 import type { Route } from "./+types/api.sign-in.callback._index";

@@ -18,7 +18,6 @@ import {
   useLoaderData
 } from "react-router";
 
-import { findRequestUser } from "./auth.server";
 import { AppProvider } from "./components/app-context";
 import { Background } from "./components/background";
 import { CloudflareAnalyticsScript } from "./components/cloudflare-analytics-script";
@@ -80,7 +79,6 @@ export function shouldRevalidate({ currentUrl }: ShouldRevalidateFunctionArgs) {
 export async function loader({ request }: LoaderFunctionArgs) {
   await middleware(request);
   const session = await getSession(request.headers.get("Cookie"));
-  const user = await findRequestUser(request);
   const ipCountry = request.headers.get("CF-IPCountry");
   const { origin: appUrl, host: appSiteName } = new URL(
     await steamCallbackUrl.get()
@@ -88,7 +86,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   return data({
     rules: {
-      ...(await getClientRules(user?.id)),
+      ...(await getClientRules(undefined)), // убираем user?.id
       assetsBaseUrl: nonEmptyString(ASSETS_BASE_URL),
       cloudflareAnalyticsToken: CLOUDFLARE_ANALYTICS_TOKEN,
       sourceCommit: SOURCE_COMMIT,
@@ -99,11 +97,10 @@ export async function loader({ request }: LoaderFunctionArgs) {
       ...(await getLanguage(session, ipCountry)),
       ...(await getToggleable(session))
     },
-    user,
 
-    // ✅ ДОБАВЛЕНО: прокидываем VITE_OPEN_CASE_MODE в клиент
+    // убираем user,
     env: {
-    OPEN_CASE_MODE
+      OPEN_CASE_MODE
     }
   });
 }

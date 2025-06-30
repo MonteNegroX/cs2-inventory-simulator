@@ -6,6 +6,7 @@ interface CustomOverride {
     image?: string;
     contents?: number[];
     price?: number[];
+    animation?: string; // путь к lottie json
 }
 
 // Приведение ключей к числам для строгой типизации
@@ -29,6 +30,9 @@ export function applyCustomOverrides(item: CS2EconomyItem): CS2EconomyItem {
         if (override.contents) {
             console.log(`✅ Applying contents override to case ${item.id}`);
             item.contents = override.contents;
+        }
+        if (override.animation) {
+          (item as any).animation = override.animation;
         }
     }
     return item;

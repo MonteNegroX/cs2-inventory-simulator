@@ -34,6 +34,8 @@ import { alert, confirm } from "./modal-generic";
 import { useWalletBalance } from "~/components/WalletBalanceContext";
 import { CS2ItemType, CS2RarityColor } from "@ianlucas/cs2-lib";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
+import Lottie from "lottie-react";
+import React, { useState, useEffect } from "react";
 
 export function InventoryItem({
   disableContextMenu,
@@ -108,6 +110,17 @@ export function InventoryItem({
 
   // ✅ Применяем кастомные overrides, включая price из overrides.json
   const overriddenItem = applyCustomOverrides(item);
+  const animationPath = (overriddenItem as any).animation ?? null;
+  const [lottieData, setLottieData] = useState(null);
+
+  useEffect(() => {
+    if (animationPath) {
+      fetch(animationPath)
+        .then((res) => res.json())
+        .then((data) => setLottieData(data))
+        .catch((err) => console.error("❌ Ошибка загрузки Lottie:", err));
+    }
+  }, [animationPath]);
 
   // ✅ Берём price только из overrides.json
   const dynamicPrice = overriddenItem.price ?? undefined;
@@ -199,26 +212,35 @@ export function InventoryItem({
 
   return (
     <>
-      <div
-        className={clsx(
-          "relative w-[154px] transition-all",
-          onClick === undefined && "hover:drop-shadow-[0_0_5px_rgba(0,0,0,1)]"
-        )}
-        ref={ref}
-        {...getHoverReferenceProps(getClickReferenceProps())}
-      >
-        <InventoryItemTile
-          equipped={equipped}
-          item={overriddenItem}
-          onClick={
-            canUnlockContainer
-              ? () => onUnlockContainer?.(uid)
-              : onClick !== undefined
-              ? close(() => onClick(uid))
-              : undefined
-          }
-        />
-      </div>
+  <div
+    className={clsx(
+      "relative w-[154px] transition-all",
+      onClick === undefined && "hover:drop-shadow-[0_0_5px_rgba(0,0,0,1)]"
+    )}
+    ref={ref}
+    {...getHoverReferenceProps(getClickReferenceProps())}
+  >
+    {animationPath ? (
+      <Lottie
+        animationData={lottieData}
+        loop
+        autoplay
+        style={{ width: "100%", height: "100%" }}
+      />
+    ) : (
+      <InventoryItemTile
+        equipped={equipped}
+        item={overriddenItem}
+        onClick={
+          canUnlockContainer
+            ? () => onUnlockContainer?.(uid)
+            : onClick !== undefined
+            ? close(() => onClick(uid))
+            : undefined
+        }
+      />
+    )}
+  </div>
       {!isFreeInventoryItem && !disableContextMenu && isClickOpen && (
         <FloatingFocusManager context={clickContext} modal={false}>
           <div
