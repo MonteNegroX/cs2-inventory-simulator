@@ -14,9 +14,8 @@ export function Footer() {
 
   const menuItems = [
     { to: "/", label: "КЕЙСЫ", icon: Home },
-    { to: "/weekly", label: "Weekly", icon: Zap },
-    { to: "/jackpot", label: "JackPot", icon: Flame },
-    { to: "/upgrade", label: "Upgrade", icon: Rocket },
+    { to: "/board", label: "ТОП", icon: Flame },
+    { to: "/quest", label: "КВЕСТ", icon: Zap },
     { to: "/profile", label: "ИНВЕНТАРЬ", icon: User },
   ];
 
