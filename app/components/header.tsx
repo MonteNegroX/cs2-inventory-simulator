@@ -34,6 +34,8 @@ import { TonConnectButton } from "@tonconnect/ui-react";
 import { WalletBalanceStub } from "~/components/WalletBalanceStub";
 import { useWalletBalance } from "~/components/WalletBalanceContext";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
+import { ProfilePopup } from "./ProfilePopup";
+import { useState } from "react";
 
 
 export function Header({
@@ -42,7 +44,8 @@ export function Header({
   showInventoryFilter?: boolean;
 }) {
   const user = useUser();
-  const { user: tgUser, loading: tgLoading } = useTelegramAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user: tgUser, logout: tgLogout } = useTelegramAuth();
   const [inventory] = useInventory();
   const { hideFilters } = usePreferences();
   const translate = useTranslate();
@@ -85,20 +88,33 @@ export function Header({
   <TonConnectButton />
   <WalletBalanceStub />
   {tgUser && (
-    <div className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity">
-      {tgUser.photo_url && (
-        <img
-          src={tgUser.photo_url}
-          alt="avatar"
-          className="h-8 w-8 rounded-full"
-          draggable={false}
+    <>
+      <div
+        className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity"
+        onClick={() => setIsProfileOpen(true)}
+      >
+        {tgUser.photo_url && (
+          <img
+            src={tgUser.photo_url}
+            alt="avatar"
+            className="h-8 w-8 rounded-full"
+            draggable={false}
+          />
+        )}
+        <span className="text-sm text-neutral-200 truncate max-w-[100px]">
+          {tgUser.first_name || tgUser.username}
+        </span>
+      </div>
+      {isProfileOpen && (
+        <ProfilePopup
+          user={tgUser}
+          onClose={() => setIsProfileOpen(false)}
+          onLogout={tgLogout}
         />
       )}
-      <span className="text-sm text-neutral-200 truncate max-w-[100px]">
-        {tgUser.first_name || tgUser.username}
-      </span>
-    </div>
-  )}
+    </>
+)}
+
   </div>
 
       {(isDesktop || isMenuOpen) && (
@@ -137,7 +153,7 @@ export function Header({
                     onClick={closeMenu}
                     label={translate("HeaderSettingsLabel")}
                   />
-                  
+
                 </div>
               </>
             ) : (
