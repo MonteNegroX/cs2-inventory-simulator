@@ -74,17 +74,42 @@ export function UnlockCase({
         );
         console.log("✅ После unlockContainer:", updatedInventory);
 
-        // Возвращаем кейс через add перед setInventory
-        updatedInventory.add({
-            id: containerItemBefore.id,
-        });
+        updatedInventory.add({ id: containerItemBefore.id });
         console.log("✅ Контейнер возвращён в инвентарь через .add()");
 
-        // Ставим inventory один раз
         setInventory(updatedInventory);
         console.log("✅ Инвентарь обновлён через setInventory");
     } catch (e) {
         console.error("❌ Ошибка при вызове unlockContainer или возврате кейса:", e);
+    }
+
+    // 🔻 Добавляем лог открытия кейса здесь
+    try {
+      const casePrice = 2; // либо caseItem.price ?? 2
+      const econItem = CS2Economy.getById(unlockedItem.id);
+      const overridden = applyCustomOverrides({ ...econItem });
+      const droppedItemName = overridden.name;
+      const droppedPrice = overridden.price || 0;
+
+      const houseEdge = ((casePrice - droppedPrice) / casePrice) * 100;
+
+      console.log({
+        casePrice,
+        droppedPrice,
+        formula: ((casePrice - droppedPrice) / casePrice),
+        houseEdge
+      });
+
+      let color = "color: #00FF00; font-weight: bold;";
+      if (houseEdge > 20) color = "color: #FF0000; font-weight: bold;";
+      else if (houseEdge > 10) color = "color: #FFFF00; font-weight: bold;";
+
+      console.log(
+        `%c💰 Открыт кейс: потрачено ${casePrice} TON, выпал "${droppedItemName}" (${droppedPrice} TON), house edge: ${houseEdge.toFixed(2)}%`,
+        color
+      );
+    } catch (e) {
+        console.error("❌ Ошибка при логировании открытия кейса:", e);
     }
 
     // Сохраняем unlockedItem для UI
@@ -92,7 +117,8 @@ export function UnlockCase({
 
     unlockedItemRef.current = undefined;
     console.log("🔚 Завершение вызова");
-  }
+}
+
 
 
   function handleClose() {
