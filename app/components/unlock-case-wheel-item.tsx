@@ -9,11 +9,13 @@ import { ItemImage } from "./item-image";
 export function UnlockCaseWheelItem({
   caseItem,
   index,
-  unlockedItem
+  unlockedItem,
+  disableAnimation = false // ✅ добавлено
 }: {
   caseItem: CS2EconomyItem;
   index: number;
   unlockedItem: CS2UnlockedItem;
+  disableAnimation?: boolean; // ✅ добавлено
 }) {
   const item = CS2Economy.getById(unlockedItem.id);
   const display = unlockedItem.special
@@ -32,7 +34,11 @@ export function UnlockCaseWheelItem({
         className="absolute bottom-0 left-0 h-2 w-full"
         style={{ backgroundColor: item.rarity }}
       />
-      <ItemImage className="absolute top-0 left-0 h-full w-full" {...display} />
+      <ItemImage
+        className="absolute top-0 left-0 h-full w-full"
+        {...display}
+        disableAnimation={disableAnimation} // ✅ прокинули управление
+      />
     </div>
   );
 }

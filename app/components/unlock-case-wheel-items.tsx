@@ -13,12 +13,14 @@ export const UnlockCaseWheelItems = forwardRef(function Items(
     caseItem,
     instant,
     items,
-    translateX
+    translateX,
+    disableAnimation = false // ✅ добавлено
   }: {
     caseItem: CS2EconomyItem;
     instant?: boolean;
     items: CS2UnlockedItem[];
     translateX: number;
+    disableAnimation?: boolean; // ✅ добавлено
   },
   ref: ForwardedRef<Element>
 ) {
@@ -33,10 +35,11 @@ export const UnlockCaseWheelItems = forwardRef(function Items(
     >
       {items.map((item, index) => (
         <UnlockCaseWheelItem
+          key={index}
           caseItem={caseItem}
           index={index}
-          key={index}
           unlockedItem={item}
+          disableAnimation={disableAnimation} // ✅ передаём дальше
         />
       ))}
     </div>

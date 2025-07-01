@@ -5,14 +5,12 @@
 
 import { CS2EconomyItem, CS2InventoryItem } from "@ianlucas/cs2-lib";
 import clsx from "clsx";
-import { ComponentProps, useEffect, useState, useRef } from "react";
+import { ComponentProps, useEffect, useState } from "react";
 import { isServerContext } from "~/globals";
 import { getCDNUrl } from "~/utils/economy";
 import { noop } from "~/utils/misc";
 import { FillSpinner } from "./fill-spinner";
 import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
-import Lottie from "lottie-react";
-
 
 let cached: string[] = [];
 
@@ -33,14 +31,6 @@ export function ItemImage({
 }) {
   type ??= "default";
 
-  // ✅ ВСЕ ХУКИ В ВЕРХНЕЙ ЧАСТИ
-  const animationPath = CUSTOM_OVERRIDES[item.id]?.animation ?? null;
-  const [lottieData, setLottieData] = useState(null);
-  const [hovered, setHovered] = useState(false);
-  const lottieRef = useRef<LottieRefCurrentProps>(null);
-
-
-
   let url =
     CUSTOM_OVERRIDES[item.id]?.image ??
     getCDNUrl(
@@ -56,16 +46,7 @@ export function ItemImage({
   );
 
   useEffect(() => {
-    if (animationPath) {
-      fetch(animationPath)
-        .then((res) => res.json())
-        .then((data) => setLottieData(data))
-        .catch((err) => console.error("❌ Ошибка загрузки Lottie:", err));
-    }
-  }, [animationPath]);
-
-  useEffect(() => {
-    if (!loaded && !animationPath) { // ⚠️ Проверяем, чтобы не грузить img при наличии animation
+    if (!loaded) {
       let controller: AbortController | undefined = undefined;
       function fetchImage() {
         controller = new AbortController();
@@ -85,33 +66,13 @@ export function ItemImage({
         controller?.abort();
       };
     }
-  }, [lazy, loaded, animationPath]);
+  }, [lazy, loaded, url]);
 
   useEffect(() => {
     if (loaded) {
       onLoad?.();
     }
   }, [loaded]);
-
-  // ✅ ТЕПЕРЬ МОЖНО УСЛОВНЫЙ РЕНДЕР
-  if (lottieData) {
-    return (
-      <div
-        {...props}
-        className={clsx(
-          "relative flex aspect-256/192 items-center justify-center",
-          className
-        )}
-      >
-        <Lottie
-          animationData={lottieData}
-          loop={false}
-          autoplay={false}
-          style={{ width: "80%", height: "80%" }}
-        />
-      </div>
-    );
-  }
 
   if (!loaded) {
     return (
@@ -137,4 +98,3 @@ export function ItemImage({
     />
   );
 }
-

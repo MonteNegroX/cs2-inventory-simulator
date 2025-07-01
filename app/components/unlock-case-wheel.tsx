@@ -52,6 +52,7 @@ export function UnlockCaseWheel({
               caseItem={caseItem}
               translateX={translateX}
               instant={!isDisplaying}
+              disableAnimation={true} // ✅
             />
           </div>
         </div>
@@ -63,6 +64,7 @@ export function UnlockCaseWheel({
               caseItem={caseItem}
               translateX={translateX}
               instant={!isDisplaying}
+              disableAnimation={true} // ✅
             />
           </div>
         </div>
