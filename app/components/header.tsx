@@ -33,6 +33,7 @@ import { Logo } from "./logo";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { WalletBalanceStub } from "~/components/WalletBalanceStub";
 import { useWalletBalance } from "~/components/WalletBalanceContext";
+import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
 
 
 export function Header({
@@ -41,6 +42,7 @@ export function Header({
   showInventoryFilter?: boolean;
 }) {
   const user = useUser();
+  const { user: tgUser, loading: tgLoading } = useTelegramAuth();
   const [inventory] = useInventory();
   const { hideFilters } = usePreferences();
   const translate = useTranslate();
@@ -62,99 +64,132 @@ export function Header({
   const isSelectingAnItem = itemSelector !== undefined;
 
   return (
-    <div
-      className={clsx(
-        "font-display sticky top-0 left-0 z-20 w-full backdrop-blur-sm transition-all before:absolute before:inset-0 before:-z-10 before:bg-linear-to-b before:from-neutral-800/60 before:to-transparent before:transition-all before:content-['']",
-        isOnTop ? "before:opacity-0" : "before:opacity-1"
+  <div
+    className={clsx(
+      "font-display sticky top-0 left-0 z-20 w-full backdrop-blur-sm transition-all before:absolute before:inset-0 before:-z-10 before:bg-linear-to-b before:from-neutral-800/60 before:to-transparent before:transition-all before:content-['']",
+      isOnTop ? "before:opacity-0" : "before:opacity-1"
+    )}
+  >
+    <div className="m-auto px-4 py-4 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] lg:flex lg:w-[1024px] lg:items-center lg:gap-8 lg:px-0">
+      <div className="flex items-center justify-between gap-2">
+  <Logo className="h-8" />
+  <button
+    className="px-2 py-1 lg:hidden"
+    onClick={() => toggleIsMenuOpen()}
+  >
+    <FontAwesomeIcon
+      icon={isMenuOpen ? faXmark : faBarsStaggered}
+      className="h-4"
+    />
+  </button>
+  <TonConnectButton />
+  <WalletBalanceStub />
+  {tgUser && (
+    <div className="flex items-center space-x-2 cursor-pointer hover:opacity-90 transition-opacity">
+      {tgUser.photo_url && (
+        <img
+          src={tgUser.photo_url}
+          alt="avatar"
+          className="h-8 w-8 rounded-full"
+          draggable={false}
+        />
       )}
-    >
-      <div className="m-auto px-4 py-4 text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.5)] lg:flex lg:w-[1024px] lg:items-center lg:gap-8 lg:px-0">
-        <div className="flex items-center justify-between">
-          <Logo className="h-8" />
-          <button
-            className="px-2 py-1 lg:hidden"
-            onClick={() => toggleIsMenuOpen()}
-          >
-            <FontAwesomeIcon
-              icon={isMenuOpen ? faXmark : faBarsStaggered}
-              className="h-4"
+      <span className="text-sm text-neutral-200 truncate max-w-[100px]">
+        {tgUser.first_name || tgUser.username}
+      </span>
+    </div>
+  )}
+  </div>
+
+      {(isDesktop || isMenuOpen) && (
+        <div className="absolute left-0 mt-2 w-full flex-1 px-4 lg:static lg:mt-0 lg:w-auto lg:p-0">
+          <nav className="rounded-sm bg-stone-800 p-2 text-sm lg:flex lg:items-center lg:gap-4 lg:bg-transparent lg:p-0">
+            <HeaderLink
+              to="/"
+              icon={faBoxesStacked}
+              label={translate("HeaderInventoryLabel")}
+              onClick={closeMenu}
             />
-          </button>
-          <TonConnectButton />
-          <WalletBalanceStub />
-        </div>
-        {(isDesktop || isMenuOpen) && (
-          <div className="absolute left-0 mt-2 w-full flex-1 px-4 lg:static lg:mt-0 lg:w-auto lg:p-0">
-            <nav className="rounded-sm bg-stone-800 p-2 text-sm lg:flex lg:items-center lg:gap-4 lg:bg-transparent lg:p-0">
-              <HeaderLink
-                to="/"
-                icon={faBoxesStacked}
-                label={translate("HeaderInventoryLabel")}
-                onClick={closeMenu}
-              />
-              <HeaderLink
-                disabled={isCraftDisabled}
-                disabledText={
-                  isInventoryFull
-                    ? translate("HeaderCraftInventoryFull")
-                    : translate("HeaderCraftCannotCraft")
-                }
-                to="/craft"
-                icon={faHammer}
-                label={translate("HeaderCraftLabel")}
-                onClick={closeMenu}
-              />
-              {user === undefined ? (
-                <>
+            <HeaderLink
+              disabled={isCraftDisabled}
+              disabledText={
+                isInventoryFull
+                  ? translate("HeaderCraftInventoryFull")
+                  : translate("HeaderCraftCannotCraft")
+              }
+              to="/craft"
+              icon={faHammer}
+              label={translate("HeaderCraftLabel")}
+              onClick={closeMenu}
+            />
+
+            {user === undefined ? (
+              <>
+                <HeaderLink
+                  to="/sign-in"
+                  icon={faSteam}
+                  label={translate("HeaderSignInLabel")}
+                />
+                <div className="gap-4 lg:flex lg:flex-1 lg:justify-end items-center">
                   <HeaderLink
-                    to="/sign-in"
-                    icon={faSteam}
-                    label={translate("HeaderSignInLabel")}
-                  />
-                  <div className="gap-4 lg:flex lg:flex-1 lg:justify-end">
-                    <DonateHeaderLink />
-                    <HeaderLink
-                      to="/settings"
-                      icon={faCog}
-                      onClick={closeMenu}
-                      label={translate("HeaderSettingsLabel")}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <HeaderLink
-                    icon={faRightFromBracket}
-                    label={translate("HeaderSignOutLabel")}
+                    to="/settings"
+                    icon={faCog}
                     onClick={closeMenu}
-                    to="/sign-out"
+                    label={translate("HeaderSettingsLabel")}
                   />
-                  <div className="gap-4 lg:flex lg:flex-1 lg:justify-end">
-                    <DonateHeaderLink />
-                    <HeaderLink to="/settings" onClick={closeMenu}>
-                      <span className="text-neutral-400">
-                        {translate("HeaderSignedInAsLabel")}
+                  
+                </div>
+              </>
+            ) : (
+              <>
+                <HeaderLink
+                  icon={faRightFromBracket}
+                  label={translate("HeaderSignOutLabel")}
+                  onClick={closeMenu}
+                  to="/sign-out"
+                />
+                <div className="gap-4 lg:flex lg:flex-1 lg:justify-end items-center">
+                  <DonateHeaderLink />
+                  <HeaderLink to="/settings" onClick={closeMenu}>
+                    <span className="text-neutral-400">
+                      {translate("HeaderSignedInAsLabel")}
+                    </span>
+                    <span className="max-w-[256px] overflow-hidden text-ellipsis whitespace-nowrap">
+                      {user.name}
+                    </span>
+                    <img
+                      className="h-6 w-6 rounded-full"
+                      src={user.avatar}
+                      draggable={false}
+                      alt={user.name}
+                    />
+                  </HeaderLink>
+                  {tgUser && (
+                    <div className="flex items-center space-x-2 px-2 py-1 rounded bg-stone-700">
+                      {tgUser.photo_url && (
+                        <img
+                          src={tgUser.photo_url}
+                          alt="avatar"
+                          className="h-6 w-6 rounded-full"
+                          draggable={false}
+                        />
+                      )}
+                      <span className="text-sm text-white truncate max-w-[120px]">
+                        {tgUser.first_name || tgUser.username}
                       </span>
-                      <span className="max-w-[256px] overflow-hidden text-ellipsis whitespace-nowrap">
-                        {user.name}
-                      </span>
-                      <img
-                        className="h-6 w-6 rounded-full"
-                        src={user.avatar}
-                        draggable={false}
-                        alt={user.name}
-                      />
-                    </HeaderLink>
-                  </div>
-                </>
-              )}
-            </nav>
-          </div>
-        )}
-      </div>
-      {showInventoryFilter && !hideFilters && !isSelectingAnItem && (
-        <InventoryFilter />
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+          </nav>
+        </div>
       )}
     </div>
-  );
+    {showInventoryFilter && !hideFilters && !isSelectingAnItem && (
+      <InventoryFilter />
+    )}
+  </div>
+);
+
 }

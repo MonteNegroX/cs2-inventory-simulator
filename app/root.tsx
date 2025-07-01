@@ -52,6 +52,7 @@ import { nonEmptyString } from "./utils/misc";
 import { TonProvider } from "./TonProvider";
 import CustomInventory from "~/components/CustomInventory";
 import { WalletBalanceProvider } from "~/components/WalletBalanceContext";
+import { TelegramAuthProvider } from "~/contexts/TelegramAuthContext";
 
 const bodyFontUrl =
   "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,400..800;1,62.5..100,400..800&display=swap";
@@ -132,8 +133,10 @@ export default function App() {
         {getSeoMeta(appProps.rules).map((attributes, index) => (
           <meta key={index} {...attributes} />
         ))}
+        <script src="https://telegram.org/js/telegram-web-app.js"></script>
       </head>
       <body className="overflow-y-scroll bg-stone-800">
+<TelegramAuthProvider>
   <AppProvider {...appProps}>
     <WalletBalanceProvider>
       <TonProvider>
@@ -176,6 +179,7 @@ export default function App() {
       </TonProvider>
     </WalletBalanceProvider>
   </AppProvider>
+</TelegramAuthProvider>
 </body>
 
 
