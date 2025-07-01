@@ -157,8 +157,6 @@ export default function App() {
 
           <Outlet />
 
-          <CustomInventory />
-
           {footer && <Footer />}
           <SyncIndicator />
           <ScrollRestoration />

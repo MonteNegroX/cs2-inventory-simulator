@@ -32,6 +32,8 @@ import { useItemSelector } from "./item-selector-context";
 import { Logo } from "./logo";
 import { TonConnectButton } from "@tonconnect/ui-react";
 import { WalletBalanceStub } from "~/components/WalletBalanceStub";
+import { useWalletBalance } from "~/components/WalletBalanceContext";
+
 
 export function Header({
   showInventoryFilter

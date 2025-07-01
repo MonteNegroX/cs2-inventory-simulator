@@ -37,7 +37,6 @@ export function UnlockCase({
   const [isDisplaying, setIsDisplaying] = useState(false);
   const [canUnlock, setCanUnlock] = useState(true);
   const [unlockedItem, setUnlockedItem] = useState<CS2UnlockedItem>();
-
   const [hideCaseContents, setHideCaseContents] = useState(false);
   const unlockedItemRef = useRef<CS2UnlockedItem>(undefined);
 
@@ -48,16 +47,53 @@ export function UnlockCase({
   const wait = useTimer();
 
   function addUnlockedItemToInventory() {
+    console.log("🟢 [addUnlockedItemToInventory] Старт вызова");
+
     const unlockedItem = unlockedItemRef.current;
-    if (!unlockedItem) return;
+    if (!unlockedItem) {
+        console.warn("⚠️ unlockedItem пуст, выход");
+        return;
+    }
+
+    console.log("🔹 unlockedItem:", unlockedItem);
+    console.log("🔹 caseUid:", caseUid);
+
+    const containerItemBefore = inventory.get(caseUid);
+    console.log("🔹 containerItemBefore:", containerItemBefore);
+
+    if (!containerItemBefore) {
+        console.error("❌ Контейнер отсутствует перед unlockContainer, выход");
+        return;
+    }
+
+    try {
+        const updatedInventory = inventory.unlockContainer(
+            unlockedItem,
+            caseUid,
+            undefined
+        );
+        console.log("✅ После unlockContainer:", updatedInventory);
+
+        // Возвращаем кейс через add перед setInventory
+        updatedInventory.add({
+            id: containerItemBefore.id,
+        });
+        console.log("✅ Контейнер возвращён в инвентарь через .add()");
+
+        // Ставим inventory один раз
+        setInventory(updatedInventory);
+        console.log("✅ Инвентарь обновлён через setInventory");
+    } catch (e) {
+        console.error("❌ Ошибка при вызове unlockContainer или возврате кейса:", e);
+    }
+
+    // Сохраняем unlockedItem для UI
     setUnlockedItem(unlockedItem);
-    setInventory(prev => {
-        let updated = prev.unlockContainer(unlockedItem, caseUid, keyUid);
-        updated = updated.addContainer(caseItem); // добавляем дубль кейса
-        return updated;
-    });
+
     unlockedItemRef.current = undefined;
-}
+    console.log("🔚 Завершение вызова");
+  }
+
 
   function handleClose() {
     addUnlockedItemToInventory();

@@ -83,13 +83,13 @@ export function AppProvider({
   preferences,
   rules,
   user,
-  env // ✅ добавляем
+  env
 }: Omit<
   ContextType<typeof AppContext>,
   "inventory" | "inventoryFilter" | "items" | "translation" | "setInventory"
 > & {
   children: ReactNode;
-  env: { OPEN_CASE_MODE: string }; // ✅ добавляем типизацию env
+  env: { OPEN_CASE_MODE: string };
 }) {
   const inventorySpec = {
     data: user?.inventory
@@ -162,6 +162,24 @@ export function AppProvider({
     ]
   );
 
+  // ✅ Добавляем обработчик кастомного события для фильтрации при нажатии футера
+  useEffect(() => {
+    const handler = () => {
+      const primaryIndex = INVENTORY_PRIMARY_FILTERS.indexOf("GraphicArt");
+      const secondaryIndex = INVENTORY_SECONDARY_FILTERS["GraphicArt"].indexOf("Stickers");
+
+      // Вызываем клики для установки фильтра
+      inventoryFilter.handlePrimaryClick(primaryIndex)();
+      inventoryFilter.handleSecondaryClick(secondaryIndex)();
+    };
+
+    window.addEventListener("set-filters-graphicart-stickers", handler);
+
+    return () => {
+      window.removeEventListener("set-filters-graphicart-stickers", handler);
+    };
+  }, [inventoryFilter]);
+
   return (
     <AppContext.Provider
       value={{
@@ -173,10 +191,11 @@ export function AppProvider({
         rules,
         setInventory,
         user,
-        env // ✅ добавляем в value для доступа из useAppContext
+        env
       }}
     >
       {children}
     </AppContext.Provider>
   );
 }
+

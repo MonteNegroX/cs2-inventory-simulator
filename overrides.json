@@ -274,6 +274,7 @@
   "1918": {
     "name": "Desk Calendar",
     "image": "downloaded_webp/deskcalendar.webp",
+    "animation": "/lottie/deskcalendar.json",
     "price": "1.8"
   },
   "1920": {
