@@ -213,7 +213,7 @@ export function Inventory() {
           onDismiss={dismissSelectItem}
         />
       )}
-      <div className="grid w-full [grid-template-columns:repeat(auto-fit,minmax(154px,1fr))] px-2 select-none [grid-gap:1em] place-content-start lg:my-8 lg:w-[1024px] lg:px-0">
+      <div className="grid w-full [grid-template-columns:repeat(auto-fit,minmax(154px,1fr))] px-2 select-none [grid-gap:1em] place-content-start lg:mx-8 lg:w-[1024px] lg:px-0">
         {displayedItems.map((item) => (
           <div key={item.uid} className="flex items-start justify-center">
             <InventoryItem
