@@ -1,7 +1,8 @@
-// db/supabase.ts
-import { createClient } from "@supabase/supabase-js";
+// app/db/supabase.ts
 
-export const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_KEY!
+import { createBrowserClient } from "@supabase/auth-helpers-remix";
+
+export const supabase = createBrowserClient(
+  import.meta.env.VITE_SUPABASE_URL!,
+  import.meta.env.VITE_SUPABASE_ANON_KEY!
 );
