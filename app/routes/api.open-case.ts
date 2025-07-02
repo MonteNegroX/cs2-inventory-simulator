@@ -1,107 +1,85 @@
 // app/routes/api.open-case.ts
 
-import { supabaseServer } from "~/db/supabaseServer";
-import { CS2Economy } from "@ianlucas/cs2-lib";
+import { supabaseAdmin } from "~/db/supabaseServer";
 
 export const action = async ({ request }) => {
   try {
     const body = await request.json();
+    console.log("🪐 Received open-case request:", body);
+
     const { user_id, case_id } = body;
 
     if (!user_id || !case_id) {
+      console.error("❌ Missing user_id or case_id:", { user_id, case_id });
       return new Response(JSON.stringify({ error: "Missing user_id or case_id" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // 1️⃣ Загружаем игрока
-    const { data: player, error: playerError } = await supabaseServer
+    // Загружаем текущего игрока
+    const { data: player, error: fetchError } = await supabaseAdmin
       .from("players")
       .select("*")
       .eq("user_id", user_id)
       .single();
 
-    if (playerError || !player) {
-      console.error("❌ Player not found:", playerError);
-      return new Response(JSON.stringify({ error: "Player not found" }), {
-        status: 404,
+    if (fetchError || !player) {
+      console.error("❌ Error fetching player:", fetchError);
+      return new Response(JSON.stringify({ error: fetchError?.message || "Player not found" }), {
+        status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // 2️⃣ Получаем кейс из CS2Economy
-    const caseItem = CS2Economy.getById(case_id);
-    if (!caseItem) {
-      return new Response(JSON.stringify({ error: "Case not found" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const casePrice = caseItem.price ?? 2; // TON
-
+    // Проверяем баланс
+    const casePrice = 2; // можно динамически подгружать цену кейса
     if (player.balance < casePrice) {
+      console.error(`❌ Insufficient balance: ${player.balance} < ${casePrice}`);
       return new Response(JSON.stringify({ error: "Insufficient balance" }), {
         status: 400,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    // 3️⃣ Открываем кейс
-    const unlockedItem = caseItem.unlockContainer();
-    const econItem = CS2Economy.getById(unlockedItem.id);
+    // Выбираем случайный предмет (заглушка)
+    const item = {
+      id: 123,
+      name: "Test Item",
+      rarity: "Rare",
+      price: 1.5,
+      image_url: "https://placehold.co/64",
+      wear: 0.123 // ✅ Добавляем wear
 
-    const droppedPrice = econItem.price ?? 0;
-    const newBalance = player.balance - casePrice;
-    const newNetLoss = (player.net_loss ?? 0) + (casePrice - droppedPrice);
+    };
 
-    // 4️⃣ Обновляем игрока
-    const updatedInventory = [...(player.inventory ?? []), {
-      id: econItem.id,
-      name: econItem.name,
-      rarity: econItem.rarity,
-      price: droppedPrice,
-      image_url: econItem.image ?? ""
-    }];
-
-    const { error: updateError } = await supabaseServer
+    // Обновляем баланс игрока
+    const { data: updated, error: updateError } = await supabaseAdmin
       .from("players")
       .update({
-        balance: newBalance,
-        net_loss: newNetLoss,
-        inventory: updatedInventory,
-        updated_at: new Date().toISOString(),
+        balance: player.balance - casePrice,
+        inventory: [...(player.inventory ?? []), item],
       })
-      .eq("user_id", user_id);
+      .eq("user_id", user_id)
+      .select("*")
+      .single();
 
     if (updateError) {
       console.error("❌ Error updating player after case open:", updateError);
-      return new Response(JSON.stringify({ error: "Failed to update player" }), {
+      return new Response(JSON.stringify({ error: updateError.message }), {
         status: 500,
         headers: { "Content-Type": "application/json" },
       });
     }
 
-    console.log(`✅ ${user_id} opened case, got ${econItem.name}, balance now ${newBalance}, net_loss now ${newNetLoss}`);
+    console.log(`✅ Case opened for user ${user_id}. New balance: ${updated.balance}`);
 
-    return new Response(JSON.stringify({
-      item: {
-        id: econItem.id,
-        name: econItem.name,
-        rarity: econItem.rarity,
-        price: droppedPrice,
-        image_url: econItem.image ?? ""
-      },
-      new_balance: newBalance,
-      new_net_loss: newNetLoss
-    }), {
+    return new Response(JSON.stringify({ item }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-
   } catch (error) {
-    console.error("❌ Error in open-case:", error);
+    console.error("❌ Error in open-case action:", error);
     return new Response(JSON.stringify({ error: "Internal server error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },

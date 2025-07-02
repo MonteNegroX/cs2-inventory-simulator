@@ -1,6 +1,6 @@
 // app/routes/api.create-player.ts
 
-import { supabaseServer } from "~/db/supabaseServer";
+import { supabaseAdmin } from "~/db/supabaseServer";
 
 export const action = async ({ request }) => {
   try {
@@ -13,16 +13,40 @@ export const action = async ({ request }) => {
         headers: { "Content-Type": "application/json" },
       });
     }
-
-    const { data, error } = await supabaseServer
+    // Проверяем, есть ли уже игрок
+    const { data: existingPlayer, error: fetchError } = await supabaseAdmin
       .from("players")
-      .upsert(
+      .select("*")
+      .eq("user_id", user_id)
+      .single();
+
+    if (fetchError && fetchError.code !== "PGRST116") {
+      console.error("❌ Error checking player existence:", fetchError);
+      return new Response(JSON.stringify({ error: fetchError.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Если игрок существует, просто возвращаем его
+    if (existingPlayer) {
+      console.log("✅ Player already exists:", user_id);
+      return new Response(JSON.stringify({ data: existingPlayer }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Если нет, создаем с дефолтными значениями
+    const { data, error } = await supabaseAdmin
+      .from("players")
+      .insert(
         {
           user_id,
           username: username ?? null,
           inventory: [],
           balance: 0,
-          net_loss: 0
+          net_loss: 0,
         },
         { onConflict: "user_id" }
       )

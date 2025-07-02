@@ -1,4 +1,4 @@
-// app/components/unlock-case.tsx
+// src/components/unlock-case/unlock-case.tsx
 
 import { CS2Economy, CS2UnlockedItem } from "@ianlucas/cs2-lib";
 import { useRef, useState } from "react";
@@ -19,6 +19,7 @@ import { UnlockCaseContainer } from "./unlock-case-container";
 import { UnlockCaseContainerUnlocked } from "./unlock-case-container-unlocked";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
+import { supabase } from "~/db/supabase";
 
 export function UnlockCase({
   caseUid,
@@ -29,8 +30,12 @@ export function UnlockCase({
   keyUid?: number;
   onClose: () => void;
 }) {
+  const debug = true;
   const { env } = useAppContext();
   const OPEN_CASE_MODE = env.OPEN_CASE_MODE ?? "CLASSIC";
+  const { user } = useTelegramAuth();
+  if (debug) console.log("👤 [UnlockCase] user:", user);
+
   const isSyncing = useIsSyncing();
   const [inventory, setInventory] = useInventory();
   const [items, setItems] = useState<CS2UnlockedItem[]>([]);
@@ -38,44 +43,66 @@ export function UnlockCase({
   const [canUnlock, setCanUnlock] = useState(true);
   const [unlockedItem, setUnlockedItem] = useState<CS2UnlockedItem>();
   const [hideCaseContents, setHideCaseContents] = useState(false);
-  const unlockedItemRef = useRef<CS2UnlockedItem>(undefined);
-
-  const { user } = useTelegramAuth(); // ✅ Исправлено
-
-  if (!user?.id) {
-    return <div>Loading user...</div>;
-  }
-
-  const userId = user.id; // ✅
+  const unlockedItemRef = useRef<CS2UnlockedItem>();
+  const wait = useTimer();
 
   const caseItem = useInventoryItem(caseUid);
   const neededKeyItem =
     caseItem.keys !== undefined ? CS2Economy.getById(caseItem.keys[0]) : undefined;
   const keyItem = useTryInventoryItem(keyUid);
-  const wait = useTimer();
 
-  function addUnlockedItemToInventory() {
-    const unlockedItem = unlockedItemRef.current;
-    if (!unlockedItem) {
-      console.warn("⚠️ unlockedItem пуст, выход");
+  async function addUnlockedItemToInventory() {
+    console.log("🟢 [addUnlockedItemToInventory] called");
+
+    if (!user?.id) {
+      console.error("❌ user.id missing, skipping Supabase save.");
+      return;
+    }
+
+    const unlocked = unlockedItemRef.current;
+    if (!unlocked) {
+      console.error("❌ unlockedItemRef empty.");
+      return;
+    }
+
+    const containerItemBefore = inventory.get(caseUid);
+    if (!containerItemBefore) {
+      console.error("❌ Container not found in inventory.");
       return;
     }
 
     try {
-      const updatedInventory = inventory.unlockContainer(
-        unlockedItem,
-        caseUid,
-        undefined
-      );
-      updatedInventory.add({ id: caseUid });
+      const updatedInventory = inventory.unlockContainer(unlocked, caseUid, undefined);
+      updatedInventory.add({ id: containerItemBefore.id });
       setInventory(updatedInventory);
-      console.log("✅ Инвентарь обновлён локально для UI");
+      console.log("✅ Inventory updated locally.");
     } catch (e) {
-      console.error("❌ Ошибка при локальном обновлении инвентаря:", e);
+      console.error("❌ Failed to update local inventory:", e);
     }
 
-    setUnlockedItem(unlockedItem);
+    try {
+      console.log("📦 Calling Supabase RPC add_item_to_inventory with:", {
+        user_id_input: user.id,
+        item_id_input: unlocked.id
+      });
+
+      const { error } = await supabase.rpc("add_item_to_inventory", {
+        user_id_input: user.id,
+        item_id_input: unlocked.id
+      });
+
+      if (error) {
+        console.error("❌ Supabase RPC error:", error);
+      } else {
+        console.log("✅ Saved to Supabase inventory JSONB via RPC.");
+      }
+    } catch (e) {
+      console.error("❌ Failed to send to Supabase:", e);
+    }
+
+    setUnlockedItem(unlocked);
     unlockedItemRef.current = undefined;
+    console.log("🔚 [addUnlockedItemToInventory] complete");
   }
 
   function handleClose() {
@@ -84,59 +111,52 @@ export function UnlockCase({
   }
 
   async function handleUnlockClassic() {
-    try {
-      setIsDisplaying(false);
-      setCanUnlock(false);
+    console.log("🎉 [handleUnlockClassic] Starting case opening...");
 
-      const res = await fetch("/api/open-case", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          user_id: userId,
-          case_id: caseUid
-        }),
-      });
+    setIsDisplaying(false);
+    setCanUnlock(false);
 
-      if (!res.ok) {
-        console.error("❌ Failed to open case:", await res.text());
-        onClose();
-        return;
-      }
+    const unlocked = caseItem.unlockContainer();
+    unlockedItemRef.current = unlocked;
 
-      const data = await res.json();
-      console.log("✅ Case opened:", data);
-
-      const unlockedItem = {
-        id: data.item.id,
-        name: data.item.name,
-        rarity: data.item.rarity,
-        price: data.item.price,
-        image: data.item.image_url
-      };
-
-      unlockedItemRef.current = unlockedItem;
+    wait(() => {
+      setHideCaseContents(true);
+      if (caseItem.keys !== undefined) playSound("case_unlock");
 
       wait(() => {
-        setHideCaseContents(true);
-        if (caseItem.keys !== undefined) playSound("case_unlock");
-        wait(() => {
-          setItems(
-            range(32).map((_, i) =>
-              i === 28 ? unlockedItem : unlockNonSpecialItem(caseItem)
-            )
-          );
-          setIsDisplaying(true);
-          wait(addUnlockedItemToInventory, 6000);
-        }, 100);
-      }, 250);
-    } catch (e) {
-      console.error("Unlock error:", e);
-      onClose();
-    }
+        setItems(
+          range(32).map((_, i) =>
+            i === 28 ? unlocked : unlockNonSpecialItem(caseItem)
+          )
+        );
+        setIsDisplaying(true);
+
+        wait(addUnlockedItemToInventory, 6000); // Save after animation
+      }, 100);
+    }, 250);
   }
 
   async function handleUnlockSimulation() {
-    // оставляем без изменений
+    const openCount = 10000;
+    const results: Record<number, number> = {};
+    let totalValue = 0;
+
+    for (let i = 0; i < openCount; i++) {
+      const unlocked = caseItem.unlockContainer();
+      results[unlocked.id] = (results[unlocked.id] || 0) + 1;
+      const econItem = CS2Economy.getById(unlocked.id);
+      const overridden = applyCustomOverrides({ ...econItem });
+      totalValue += overridden.price || 0;
+    }
+
+    const spent = openCount * (caseItem.price ?? 2);
+    const houseEdge = ((1 - totalValue / spent) * 100).toFixed(2);
+
+    console.log("🔹 10k open simulation results:", results);
+    console.log(`💰 Spent: ${spent} TON`);
+    console.log(`💎 Earned: ${totalValue.toFixed(2)} TON`);
+    console.log(`🏠 House Edge: ${houseEdge}%`);
+    alert("✅ Simulation complete, check console.");
   }
 
   const handleUnlock =
@@ -144,9 +164,7 @@ export function UnlockCase({
 
   useKeyRelease("Escape", handleClose);
 
-  if (typeof document === "undefined") {
-    return null;
-  }
+  if (typeof document === "undefined") return null;
 
   return createPortal(
     <Overlay isWrapperless>

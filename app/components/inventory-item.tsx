@@ -36,6 +36,8 @@ import { CS2ItemType, CS2RarityColor } from "@ianlucas/cs2-lib";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
 import Lottie from "lottie-react";
 import React, { useState, useEffect } from "react";
+import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
+
 
 export function InventoryItem({
   disableContextMenu,
@@ -105,7 +107,7 @@ export function InventoryItem({
     inventoryStorageUnitMaxItems
   } = useRules();
   const [inventory] = useInventory();
-  const user = useUser();
+  const { user } = useTelegramAuth();
   const { add } = useWalletBalance();
 
   // ✅ Применяем кастомные overrides, включая price из overrides.json
@@ -436,15 +438,47 @@ export function InventoryItem({
                   {
                     condition: dynamicPrice !== undefined,
                     label: "Продать",
-                    onClick: close(() => {
+                    onClick: close(async () => {
                       console.log("💸 Продаём за:", dynamicPrice);
                       const priceToAdd = Number(dynamicPrice);
+
+                      const userId = user?.id ?? user?.user?.id;
+                      if (!userId) {
+                        console.error("❌ Cannot sell, userId is missing:", user);
+                        return;
+                      }
+
                       if (!isNaN(priceToAdd) && priceToAdd > 0) {
-                      add(priceToAdd);
+                        // 1️⃣ Локально добавляем
+                        add(priceToAdd);
+
+                        // 2️⃣ Отправляем на Supabase
+                        try {
+                            const res = await fetch("/api/update-balance", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                user_id: user?.id,
+                                amount: priceToAdd
+                              }),
+                            });
+
+                            if (!res.ok) {
+                              console.error("❌ Supabase balance update failed:", await res.text());
+                              add(-priceToAdd); // откатываем при ошибке
+                            } else {
+                              const data = await res.json();
+                              console.log("✅ Supabase balance updated:", data);
+                            }
+                        } catch (e) {
+                          console.error("❌ Error updating balance in Supabase:", e);
+                          add(-priceToAdd); // откатываем при ошибке
+                        }
+
+                        onRemove?.(uid);
                       } else {
                         console.warn("❌ dynamicPrice is not a valid number:", dynamicPrice);
                       }
-                      onRemove?.(uid);
                     })
                   },
                   {
