@@ -72,6 +72,10 @@ export function UnlockCase({
     }
 
     try {
+      const econItem = CS2Economy.getById(unlocked.id);
+      const overriddenItem = applyCustomOverrides({ ...econItem });
+
+
       const updatedInventory = inventory.unlockContainer(unlocked, caseUid, undefined);
       updatedInventory.add({ id: containerItemBefore.id });
       setInventory(updatedInventory);
@@ -81,15 +85,34 @@ export function UnlockCase({
     }
 
     try {
+      const econItem = CS2Economy.getById(unlocked.id);
+
+      const overriddenItem = applyCustomOverrides({ ...econItem });
+
+      const itemForDb = {
+        id: unlocked.id,
+        name: overriddenItem.name,
+        type: overriddenItem.type,
+        rarity: overriddenItem.rarity,
+        price: overriddenItem.price,
+        image: overriddenItem.image,
+        color: overriddenItem.color,
+        exterior: overriddenItem.exterior,
+        quality: overriddenItem.quality,
+        category: overriddenItem.category,
+        ...unlocked.attributes // добавит wear, statTrak, seed, stickers, patches, keychains если есть
+      };
       console.log("📦 Calling Supabase RPC add_item_to_inventory with:", {
-        user_id_input: user.id,
-        item_id_input: unlocked.id
+        user_id: user.id,
+        item: itemForDb
       });
 
-      const { error } = await supabase.rpc("add_item_to_inventory", {
-        user_id_input: user.id,
-        item_id_input: unlocked.id
-      });
+      const { error } = await supabase.from("inventory").insert([
+        {
+          user_id: user.id,
+          item: itemForDb
+        }
+        ]);
 
       if (error) {
         console.error("❌ Supabase RPC error:", error);
