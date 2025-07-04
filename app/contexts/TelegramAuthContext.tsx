@@ -7,10 +7,10 @@ import React, {
   useEffect,
   ReactNode,
 } from "react";
-import { useEnsurePlayerCreatedOnAuth } from "../components/hooks/useEnsurePlayerCreatedOnAuth";
+import { useEnsurePlayerCreatedOnAuth } from "~/components/hooks/useEnsurePlayerCreatedOnAuth";
 
 export interface TelegramUser {
-  id: string;
+  id: number;
   first_name?: string;
   last_name?: string;
   username?: string;
@@ -65,7 +65,7 @@ export const TelegramAuthProvider = ({ children }: { children: ReactNode }) => {
     const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
     if (tgUser) {
       const userData: TelegramUser = {
-        id: String(tgUser.id),
+        id: tgUser.id,
         first_name: tgUser.first_name,
         last_name: tgUser.last_name,
         username: tgUser.username,
@@ -82,7 +82,7 @@ export const TelegramAuthProvider = ({ children }: { children: ReactNode }) => {
     // ✅ Localhost fallback
     if (!initialUser && window.location.hostname === "localhost") {
       const userData: TelegramUser = {
-        id: "fake_local_id",
+        id: 666555,
         first_name: "Local",
         last_name: "Dev",
         username: "local_dev",
