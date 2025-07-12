@@ -3,68 +3,57 @@
 import { supabaseAdmin } from "~/db/supabaseServer";
 
 export const action = async ({ request }) => {
+  const body = await request.json();
+  const { user_id, amount, overwrite } = body;
+
+  console.log("📦 updateBalance received:", body);
+  console.trace("📍 Trace for update-balance");
+
+  if (!user_id || typeof amount !== "number") {
+    return new Response(JSON.stringify({ error: "Missing or invalid user_id/amount" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   try {
-    const body = await request.json();
-    const { user_id, amount } = body;
+    if (overwrite) {
+      const { error } = await supabaseAdmin
+        .from("players")
+        .update({ balance: amount })
+        .eq("user_id", user_id);
 
-    // 💡 Добавляем логи для дебага
-    console.log("📦 update-balance received:", { user_id, amount });
+      if (error) throw error;
 
-    // Приведение к числу для безопасной проверки
-    const parsedAmount = Number(amount);
+      console.log(`✅ Balance overwritten for ${user_id}: ${amount}`);
+    } else {
+      const { data: current, error: fetchError } = await supabaseAdmin
+        .from("players")
+        .select("balance")
+        .eq("user_id", user_id)
+        .single();
 
-    if (!user_id || isNaN(parsedAmount)) {
-      console.error("❌ Invalid request payload:", { user_id, amount });
-      return new Response(JSON.stringify({ error: "Invalid request" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
+      if (fetchError) throw fetchError;
+
+      const newBalance = Number(current.balance) + amount;
+
+      const { error: updateError } = await supabaseAdmin
+        .from("players")
+        .update({ balance: newBalance })
+        .eq("user_id", user_id);
+
+      if (updateError) throw updateError;
+
+      console.log(`✅ Balance incremented for ${user_id}: +${amount} → ${newBalance}`);
     }
 
-    // Получаем текущий баланс
-    const { data: player, error: fetchError } = await supabaseAdmin
-      .from("players")
-      .select("balance")
-      .eq("user_id", user_id)
-      .single();
-
-    if (fetchError || !player) {
-      console.error("❌ Player not found:", fetchError);
-      return new Response(JSON.stringify({ error: "Player not found" }), {
-        status: 404,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const newBalance = player.balance + parsedAmount;
-
-    // Обновляем баланс
-    const { data, error } = await supabaseAdmin
-      .from("players")
-      .update({
-        balance: newBalance,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("user_id", user_id)
-      .select("*")
-      .single();
-
-    if (error) {
-      console.error("❌ Supabase update error:", error);
-      return new Response(JSON.stringify({ error: error.message }), {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    console.log(`✅ Balance updated for ${user_id}: ${newBalance}`);
-    return new Response(JSON.stringify({ data }), {
+    return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch (err) {
-    console.error("❌ Internal error:", err);
-    return new Response(JSON.stringify({ error: "Internal server error" }), {
+  } catch (e) {
+    console.error("❌ Supabase balance update failed:", e);
+    return new Response(JSON.stringify({ error: e.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });

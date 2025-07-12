@@ -28,6 +28,7 @@
     "@react-router/fs-routes": "^7.6.0",
     "@react-router/node": "^7.6.0",
     "@react-router/serve": "^7.6.0",
+    "@remix-run/node": "^2.16.8",
     "@supabase/auth-helpers-remix": "^0.4.0",
     "@supabase/supabase-js": "^2.50.2",
     "@tonconnect/sdk": "^3.2.0",
