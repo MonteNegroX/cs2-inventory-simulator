@@ -1,4 +1,4 @@
-// app/components/unlock-case.tsx
+// app/components/unlock-case.tsx 
 import { CS2Economy, CS2UnlockedItem } from "@ianlucas/cs2-lib";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
