@@ -6,7 +6,7 @@
 import { FloatingFocusManager } from "@floating-ui/react";
 import {
   CS2_INVENTORY_EQUIPPABLE_ITEMS,
-  CS2_MAX_PATCHES,
+  CS2_MAX_PATCHES, CS2Economy,
   CS2Team,
   CS2TeamValues
 } from "@ianlucas/cs2-lib";
@@ -37,6 +37,7 @@ import { applyCustomOverrides } from "~/utils/custom-overrides";
 import Lottie from "lottie-react";
 import React, { useState, useEffect } from "react";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
+import { supabase } from "~/db/supabase";
 
 
 export function InventoryItem({
@@ -114,6 +115,7 @@ export function InventoryItem({
   const overriddenItem = applyCustomOverrides(item);
   const animationPath = (overriddenItem as any).animation ?? null;
   const [lottieData, setLottieData] = useState(null);
+  const economy = CS2Economy.getById(item.id);
 
   useEffect(() => {
     if (animationPath) {
@@ -461,7 +463,50 @@ export function InventoryItem({
                                 user_id: user?.id,
                                 amount: priceToAdd
                               }),
-                            });
+                            })
+
+                            const itemForDb = {
+                              id: item.id,
+                              name: overriddenItem.name,
+                              type: overriddenItem.type,
+                              rarity: overriddenItem.rarity,
+                              price: overriddenItem.price,
+                              image: overriddenItem.image,
+                              color: overriddenItem.color,
+                              exterior: overriddenItem.exterior,
+                              quality: overriddenItem.quality,
+                              category: overriddenItem.category,
+                              ...item.attributes
+                            };
+
+                            await supabase
+                              .from("sales_history")
+                              .insert([
+                                {
+                                  user_id: user?.id,
+                                  item: itemForDb,
+                                  price: priceToAdd,
+                                  sold_at: new Date().toISOString()
+                                }
+                              ]);
+                            // 3️⃣ Удаляем один экземпляр из таблицы inventory
+                            const { data: rowsToDelete, error: selectError } = await supabase
+                              .from("inventory")
+                              .select("id")
+                              .eq("user_id", user?.id)
+                              .eq("item->>id", String(item.id))
+                              .limit(1)
+                              .maybeSingle();
+
+                            if (selectError)  {
+                              console.error("❌ Ошибка при поиске строки для удаления:", selectError);
+                            } else if (rowsToDelete)  {
+                              const { error: deleteError }  = await supabase
+                                .from("inventory")
+                                .delete()
+                                .eq("id", rowsToDelete.id);
+                            }
+
 
                             if (!res.ok) {
                               console.error("❌ Supabase balance update failed:", await res.text());
