@@ -53,6 +53,8 @@ import { TonProvider } from "./TonProvider";
 import CustomInventory from "~/components/CustomInventory";
 import { WalletBalanceProvider } from "~/components/WalletBalanceContext";
 import { TelegramAuthProvider } from "~/contexts/TelegramAuthContext";
+import { InitializeInventory } from "~/components/InitializeInventory";
+
 
 const bodyFontUrl =
   "https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,400..800;1,62.5..100,400..800&display=swap";
@@ -140,6 +142,8 @@ export default function App() {
   <AppProvider {...appProps}>
     <WalletBalanceProvider>
       <TonProvider>
+        {/* ✅ Добавляем инициализацию инвентаря */}
+      <InitializeInventory />
         {/* ✅ Паттерн ФОН, фиксированный на весь экран */}
         <div className="fixed inset-0 -z-10">
           <PatternCard />
