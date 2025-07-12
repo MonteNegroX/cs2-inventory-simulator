@@ -1,8 +1,8 @@
-// src/components/hooks/use-initialize-inventory-from-supabase.ts
 import { useEffect, useRef } from "react";
 import { supabase } from "~/db/supabase";
 import { CS2Inventory } from "@ianlucas/cs2-lib";
 import { useInventory } from "../app-context";
+import { getSanitizedCachedInventoryData } from "~/utils/inventory-cached-data";
 
 export function useInitializeInventoryFromSupabase(userId?: number) {
   const hasLoaded = useRef(false);
@@ -12,8 +12,11 @@ export function useInitializeInventoryFromSupabase(userId?: number) {
     if (!userId || hasLoaded.current) return;
 
     const loadInventory = async () => {
-      console.log("📦 Загрузка инвентаря из Supabase для пользователя", userId);
+      console.log("📦 Загрузка инвентаря из Supabase + кеш", userId);
 
+      const inventory = new CS2Inventory();
+
+      // 1. Загружаем из Supabase
       const { data, error } = await supabase
         .from("inventory")
         .select("item")
@@ -21,24 +24,34 @@ export function useInitializeInventoryFromSupabase(userId?: number) {
 
       if (error) {
         console.error("❌ Ошибка Supabase:", error);
-        return;
       }
-
-      const inventory = new CS2Inventory();
 
       if (data) {
         for (const row of data) {
           try {
-            inventory.add(row.item); // Добавление предмета
+            inventory.add(row.item);
           } catch (e) {
             console.warn("⚠️ Ошибка при добавлении предмета:", row.item, e);
           }
         }
       }
 
+      // 2. Добавляем кешированные предметы
+      const cached = getSanitizedCachedInventoryData();
+      if (cached?.items) {
+        for (const [uid, item] of Object.entries(cached.items)) {
+          try {
+            inventory.add(item);
+          } catch (e) {
+            console.warn("⚠️ Ошибка при добавлении кеш-предмета:", item, e);
+          }
+        }
+        console.log("✅ Добавлено кеш-предметов:", Object.keys(cached.items).length);
+      }
+
       setInventory(inventory);
       hasLoaded.current = true;
-      console.log("✅ Инвентарь загружен. Предметов:", inventory.items.length);
+      console.log("✅ Инвентарь загружен. Всего предметов:", inventory.items.length);
     };
 
     loadInventory();
