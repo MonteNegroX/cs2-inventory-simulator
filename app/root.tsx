@@ -1,8 +1,4 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Ian Lucas. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
+// app/root.tsx
 import type {
   LinksFunction,
   LoaderFunctionArgs,
@@ -161,9 +157,9 @@ export default function App() {
               {inventory && <Inventory />}
             </ItemSelectorProvider>
           )}
-
-          <Outlet />
-
+          <div className="flex-1 pb-[72px]">
+            <Outlet />
+          </div>
           {footer && <Footer />}
           <SyncIndicator />
           <ScrollRestoration />
