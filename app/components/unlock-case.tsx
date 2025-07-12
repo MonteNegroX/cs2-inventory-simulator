@@ -1,5 +1,4 @@
-// src/components/unlock-case/unlock-case.tsx
-
+// app/components/unlock-case.tsx
 import { CS2Economy, CS2UnlockedItem } from "@ianlucas/cs2-lib";
 import { useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -20,6 +19,7 @@ import { UnlockCaseContainerUnlocked } from "./unlock-case-container-unlocked";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
 import { supabase } from "~/db/supabase";
+import { logCaseOpening } from "~/utils/logCaseOpening";
 
 export function UnlockCase({
   caseUid,
@@ -75,19 +75,10 @@ export function UnlockCase({
       const econItem = CS2Economy.getById(unlocked.id);
       const overriddenItem = applyCustomOverrides({ ...econItem });
 
-
       const updatedInventory = inventory.unlockContainer(unlocked, caseUid, undefined);
       updatedInventory.add({ id: containerItemBefore.id });
       setInventory(updatedInventory);
       console.log("✅ Inventory updated locally.");
-    } catch (e) {
-      console.error("❌ Failed to update local inventory:", e);
-    }
-
-    try {
-      const econItem = CS2Economy.getById(unlocked.id);
-
-      const overriddenItem = applyCustomOverrides({ ...econItem });
 
       const itemForDb = {
         id: unlocked.id,
@@ -100,8 +91,9 @@ export function UnlockCase({
         exterior: overriddenItem.exterior,
         quality: overriddenItem.quality,
         category: overriddenItem.category,
-        ...unlocked.attributes // добавит wear, statTrak, seed, stickers, patches, keychains если есть
+        ...unlocked.attributes
       };
+
       console.log("📦 Calling Supabase RPC add_item_to_inventory with:", {
         user_id: user.id,
         item: itemForDb
@@ -112,7 +104,14 @@ export function UnlockCase({
           user_id: user.id,
           item: itemForDb
         }
-        ]);
+      ]);
+
+      await logCaseOpening({
+        user_id: user.id,
+        case_id: caseItem.id,
+        case_price: caseItem.price ?? 2, // ✅ логируем цену кейса
+        item: itemForDb
+      });
 
       if (error) {
         console.error("❌ Supabase RPC error:", error);
@@ -154,7 +153,7 @@ export function UnlockCase({
         );
         setIsDisplaying(true);
 
-        wait(addUnlockedItemToInventory, 6000); // Save after animation
+        wait(addUnlockedItemToInventory, 6000);
       }, 100);
     }, 250);
   }
