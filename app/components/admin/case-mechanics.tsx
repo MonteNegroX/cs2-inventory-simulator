@@ -13,6 +13,7 @@ export default function CaseMechanics() {
   // Mock data
   const [totalOpened, setTotalOpened] = useState(0)
   const [averagePerUser, setAveragePerUser] = useState(0)
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   useEffect(() => {
       async function fetchStats() {
@@ -40,6 +41,18 @@ export default function CaseMechanics() {
 
         setTotalOpened(openedCount || 0)
         setAveragePerUser(openedCount && uniqueUsers ? +(openedCount / uniqueUsers).toFixed(2) : 0)
+
+        // Выручка — сумма всех case_price
+        const { data:caseRows, error:caseErr } = await supabase
+          .from("case_openings")
+          .select("case_price");
+
+        if (caseErr) {
+          console.error("❌ Ошибка получения цен кейсов:", caseErr);
+        } else {
+          const revenue = caseRows.reduce((sum, row) => sum + (row.case_price || 0), 0);
+          setTotalRevenue(revenue);
+        }
       }
 
       fetchStats();
@@ -47,7 +60,6 @@ export default function CaseMechanics() {
 
   const caseStats = {
     dailyAverage: 2240,
-    totalRevenue: 89500,
   }
 
   const popularCases = [
@@ -120,11 +132,11 @@ export default function CaseMechanics() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Доход с кейсов</CardTitle>
+              <CardTitle className="text-sm font-medium">☑️️️Доход с кейсов</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${caseStats.totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">Общая выручка</div>
             </CardContent>
           </Card>
