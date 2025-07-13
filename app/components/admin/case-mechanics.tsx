@@ -1,3 +1,4 @@
+// app/components/admin/case-mechanics.tsx
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -5,17 +6,47 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Package, TrendingUp, TrendingDown, Target } from "lucide-react"
+import { useEffect, useState } from "react"
+import { supabase } from "~/db/supabase";
 
-interface CaseMechanicsProps {
-  timeRange: string
-}
-
-export default function CaseMechanics({ timeRange }: CaseMechanicsProps) {
+export default function CaseMechanics() {
   // Mock data
+  const [totalOpened, setTotalOpened] = useState(0)
+  const [averagePerUser, setAveragePerUser] = useState(0)
+
+  useEffect(() => {
+      async function fetchStats() {
+        // Всего открыто кейсов
+        const { count: openedCount, error: openErr } = await supabase
+          .from("case_openings")
+          .select("*", { count: "exact", head: true })
+
+        if (openErr) {
+          console.error("❌ Ошибка подсчета кейсов:", openErr);
+          return;
+        }
+
+        // Уникальных пользователей
+        const { data: usersRows, error: usersErr } = await supabase
+          .from("case_openings")
+          .select("user_id")
+          .not("user_id", "is", null)
+        if (usersErr) {
+          console.error("❌ Ошибка подсчета юзеров:", usersErr)
+          return;
+        }
+
+        const uniqueUsers = new Set(usersRows.map((row) => row.user_id)).size;
+
+        setTotalOpened(openedCount || 0)
+        setAveragePerUser(openedCount && uniqueUsers ? +(openedCount / uniqueUsers).toFixed(2) : 0)
+      }
+
+      fetchStats();
+  }, [])
+
   const caseStats = {
-    totalOpened: 15678,
     dailyAverage: 2240,
-    averagePerUser: 5.8,
     totalRevenue: 89500,
   }
 
@@ -56,11 +87,11 @@ export default function CaseMechanics({ timeRange }: CaseMechanicsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Всего открыто</CardTitle>
+              <CardTitle className="text-sm font-medium">☑️Всего открыто</CardTitle>
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{caseStats.totalOpened.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{totalOpened.toLocaleString()}</div>
               <div className="text-xs text-muted-foreground">За выбранный период</div>
             </CardContent>
           </Card>
@@ -78,11 +109,11 @@ export default function CaseMechanics({ timeRange }: CaseMechanicsProps) {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">На пользователя</CardTitle>
+              <CardTitle className="text-sm font-medium">☑️На пользователя</CardTitle>
               <Target className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{caseStats.averagePerUser}</div>
+              <div className="text-2xl font-bold">{averagePerUser}</div>
               <div className="text-xs text-muted-foreground">Среднее количество</div>
             </CardContent>
           </Card>
