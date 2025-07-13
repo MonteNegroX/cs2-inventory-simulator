@@ -5,20 +5,15 @@ import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Users, UserPlus, CreditCard, RotateCcw } from "lucide-react"
+import { getDateFromRange } from "~/utils/getDateFromRange";
+import { useDateRange } from "~/contexts/DateRangeContext";
+import { useUserActivationData } from "~/components/hooks/useUserActivationData";
 
-interface UserAnalyticsProps {
-  timeRange: string
-}
-
-export default function UserAnalytics({ timeRange }: UserAnalyticsProps) {
+export default function UserAnalytics() {
   // Mock data
-  const activationData = {
-    newUsers: 1247,
-    activatedUsers: 892,
-    d1Retention: 68.5,
-    d7Retention: 42.3,
-    d30Retention: 28.7,
-  }
+  const { range } = useDateRange();
+  const fromDate = getDateFromRange(range);
+  const activationData = useUserActivationData();
 
   const behaviorData = {
     registered: 1247,

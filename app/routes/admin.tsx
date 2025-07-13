@@ -1,3 +1,4 @@
+// app/routes/admin.tsx
 "use client"
 
 import { useState } from "react"
@@ -6,6 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { Button } from "~/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "~/components/ui/select"
+import "~/styles/globals.css"; // или "./globals.css", если рядом
+import adminStyles from "~/styles/globals.css?url";
+import type {
+  LinksFunction,
+  LoaderFunctionArgs,
+  ShouldRevalidateFunctionArgs
+} from "react-router";
+import { DateRange, DateRangeProvider, useDateRange } from "~/contexts/DateRangeContext";
 
 // Import dashboard sections
 import EconomicsDashboard from "~/components/admin/economics-dashboard"
@@ -14,9 +23,11 @@ import CaseMechanics from "~/components/admin/case-mechanics"
 import MarketingChannels from "~/components/admin/marketing-channels"
 import ABTests from "~/components/admin/ab-tests"
 import ReportsGraphs from "~/components/admin/reports-graphs"
-
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: adminStyles }
+];
 export default function AdminDashboard() {
-  const [timeRange, setTimeRange] = useState("7d")
+  const { range, setRange } = useDateRange();
 
   // Mock data for overview cards
   const overviewData = {
@@ -30,7 +41,18 @@ export default function AdminDashboard() {
     conversionChange: 0.8,
   }
 
+  const rangeLabels: Record<string, string> = {
+    '1d': 'Сегодня',
+    '7d': 'Последние 7 дней',
+    '30d': 'Последние 30 дней',
+    '90d': 'Последние 3 месяца',
+    'all': 'За всё время',
+  };
+
+  console.log("Current range:", range);
+
   return (
+    <DateRangeProvider>
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b bg-card">
@@ -41,15 +63,31 @@ export default function AdminDashboard() {
               <p className="text-muted-foreground">Аналитика и статистика проекта</p>
             </div>
             <div className="flex items-center gap-4">
-              <Select value={timeRange} onValueChange={setTimeRange}>
+              <Select value={range} onValueChange={(val) => {
+                setRange(val as DateRange);
+                console.log("Selected range:", val);
+                setTimeout(() => {
+                  console.log("Updated context range:", range);
+                }, 0);
+                }}
+                >
                 <SelectTrigger className="w-[180px]">
-                  <SelectValue />
+                  <SelectValue placeholder="Выберите диапазон">
+                    {{
+                      '1d': 'Сегодня',
+                      '7d': 'Последние 7 дней',
+                      '30d': 'Последние 30 дней',
+                      '90d': 'Последние 3 месяца',
+                      'all': 'За всё время',
+                    }[range] || 'Выберите диапазон'}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1d">Сегодня</SelectItem>
-                  <SelectItem value="7d">Последние 7 дней</SelectItem>
-                  <SelectItem value="30d">Последние 30 дней</SelectItem>
-                  <SelectItem value="90d">Последние 3 месяца</SelectItem>
+                  {Object.entries(rangeLabels).map(([key, label]) => (
+                    <SelectItem key={key} value={key}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Button variant="outline">
@@ -150,30 +188,31 @@ export default function AdminDashboard() {
           </TabsList>
 
           <TabsContent value="economics">
-            <EconomicsDashboard timeRange={timeRange} />
+            <EconomicsDashboard />
           </TabsContent>
 
           <TabsContent value="users">
-            <UserAnalytics timeRange={timeRange} />
+            <UserAnalytics />
           </TabsContent>
 
           <TabsContent value="cases">
-            <CaseMechanics timeRange={timeRange} />
+            <CaseMechanics />
           </TabsContent>
 
           <TabsContent value="marketing">
-            <MarketingChannels timeRange={timeRange} />
+            <MarketingChannels />
           </TabsContent>
 
           <TabsContent value="tests">
-            <ABTests timeRange={timeRange} />
+            <ABTests />
           </TabsContent>
 
           <TabsContent value="reports">
-            <ReportsGraphs timeRange={timeRange} />
+            <ReportsGraphs />
           </TabsContent>
         </Tabs>
       </div>
     </div>
+    </DateRangeProvider>
   )
 }

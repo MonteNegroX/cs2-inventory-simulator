@@ -4,13 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { TrendingUp, TrendingDown, DollarSign, CreditCard } from "lucide-react"
+import { useDateRange } from "~/contexts/DateRangeContext";
+import { getDateFromRange } from "~/utils/getDateFromRange";
 
-interface EconomicsDashboardProps {
-  timeRange: string
-}
 
-export default function EconomicsDashboard({ timeRange }: EconomicsDashboardProps) {
+export default function EconomicsDashboard() {
   // Mock data
+  const { range } = useDateRange();
+  const fromDate = getDateFromRange(range);
+
   const revenueData = {
     total: 125430,
     cases: 89500,

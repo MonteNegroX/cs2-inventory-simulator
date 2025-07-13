@@ -50,6 +50,9 @@ import CustomInventory from "~/components/CustomInventory";
 import { WalletBalanceProvider } from "~/components/WalletBalanceContext";
 import { TelegramAuthProvider } from "~/contexts/TelegramAuthContext";
 import { InitializeInventory } from "~/components/InitializeInventory";
+import adminTheme from "./styles/globals.css?url";
+import { DateRangeProvider } from "~/contexts/DateRangeContext"; // если ты положил globals.css в styles/
+
 
 
 const bodyFontUrl =
@@ -67,7 +70,10 @@ export const links: LinksFunction = () => [
   { rel: "stylesheet", href: displayFontUrl },
   { rel: "stylesheet", href: displayFontIAmPayingFor },
   { rel: "stylesheet", href: styles },
-  { rel: "manifest", href: "/app.webmanifest" }
+  { rel: "manifest", href: "/app.webmanifest" },
+  { rel: "stylesheet", href: adminTheme },
+  { rel: "stylesheet", href: bodyFontUrl },
+  { rel: "stylesheet", href: displayFontUrl }
 ];
 
 export function shouldRevalidate({ currentUrl }: ShouldRevalidateFunctionArgs) {
@@ -138,6 +144,7 @@ export default function App() {
   <AppProvider {...appProps}>
     <WalletBalanceProvider>
       <TonProvider>
+       <DateRangeProvider>
         {/* ✅ Добавляем инициализацию инвентаря */}
       <InitializeInventory />
         {/* ✅ Паттерн ФОН, фиксированный на весь экран */}
@@ -176,6 +183,7 @@ export default function App() {
           />
           <Scripts />
         </div>
+         </DateRangeProvider>
       </TonProvider>
     </WalletBalanceProvider>
   </AppProvider>
