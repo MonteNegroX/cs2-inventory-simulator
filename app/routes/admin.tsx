@@ -23,6 +23,7 @@ import CaseMechanics from "~/components/admin/case-mechanics"
 import MarketingChannels from "~/components/admin/marketing-channels"
 import ABTests from "~/components/admin/ab-tests"
 import ReportsGraphs from "~/components/admin/reports-graphs"
+import Constructor from "~/components/admin/construct"
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: adminStyles }
 ];
@@ -99,7 +100,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="container mx-auto px-4 py-6">
+      <div className="container mx-auto px-4 py-7">
 
         {/* Main Dashboard Tabs */}
         <Tabs defaultValue="economics" className="space-y-6">
@@ -128,6 +129,9 @@ export default function AdminDashboard() {
               <TrendingUp className="h-4 w-4" />
               Отчёты
             </TabsTrigger>
+            <TabsTrigger value="construct" className="flex items-center gap-2">
+              🧰 Конструктор
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="economics">
@@ -152,6 +156,9 @@ export default function AdminDashboard() {
 
           <TabsContent value="reports">
             <ReportsGraphs />
+          </TabsContent>
+          <TabsContent value="construct">
+            <Constructor />
           </TabsContent>
         </Tabs>
       </div>
