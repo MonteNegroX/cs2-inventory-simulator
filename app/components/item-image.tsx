@@ -94,7 +94,7 @@ export function ItemImage({
       draggable={false}
       src={url}
       {...props}
-      className={clsx("aspect-256/192", className)}
+      className={clsx(className)}
     />
   );
 }

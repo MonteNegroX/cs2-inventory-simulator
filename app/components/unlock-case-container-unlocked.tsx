@@ -13,6 +13,9 @@ import { ItemImage } from "./item-image";
 import { ModalButton } from "./modal-button";
 import { UnlockCaseAttribute } from "./unlock-case-attribute";
 import { UseItemFooter } from "./use-item-footer";
+import Lottie from "lottie-react";
+import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
+
 
 export function UnlockCaseContainerUnlocked({
   caseItem,
@@ -42,6 +45,17 @@ export function UnlockCaseContainerUnlocked({
   });
 
   const item = CS2Economy.getById(id);
+  const animationPath = CUSTOM_OVERRIDES[item.id]?.animation;
+  const [animationData, setAnimationData] = useState<any>(null);
+
+  useEffect(() => {
+    if (animationPath) {
+      fetch(animationPath)
+        .then((res) => res.json())
+        .then(setAnimationData)
+        .catch(console.error);
+    }
+  }, [animationPath]);
 
   return (
     <div className="flex h-full w-full items-center justify-center text-center drop-shadow-sm">
@@ -58,15 +72,27 @@ export function UnlockCaseContainerUnlocked({
           <ItemImage className="h-8" item={caseItem} />
           <span>{nameItemString(caseItem)}</span>
         </div>
+        {animationData ? (
+          <div key={`animation-${item.id}`}>
+          <Lottie
+            animationData={animationData}
+            loop={false}
+            autoplay={true}
+            className="[transform-origin:center] [transition:all_cubic-bezier(0.4,0,0.2,1)_250ms]"
+            style={{ transform: `scale(${revealScale})` }}
+            onComplete={handleLoad}
+          />
+          </div>
+        ) : (
         <ItemImage
-          className="m-auto my-4 max-w-[512px] [transition:all_cubic-bezier(0.4,0,0.2,1)_250ms]"
+          className="m-auto my-4 max-w-[90vw] max-h-[80vh] [transition:all_cubic-bezier(0.4,0,0.2,1)_250ms]"
           item={item}
           style={{ transform: `scale(${revealScale})` }}
           onLoad={handleLoad}
           wear={attributes.wear}
-        />
+        />)}
         <UseItemFooter
-          className="lg:min-w-[1024px]"
+          className="lg:min-w-[512px]"
           left={
             <div className="flex items-center gap-8">
               <UnlockCaseAttribute
@@ -81,7 +107,7 @@ export function UnlockCaseContainerUnlocked({
           }
           right={
             <ModalButton
-              children={translate("CaseClose")}
+              children="Тест"
               onClick={onClose}
               variant="secondary"
             />

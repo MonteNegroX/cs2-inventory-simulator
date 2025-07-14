@@ -34,7 +34,6 @@ export function UnlockCase({
   const { env } = useAppContext();
   const OPEN_CASE_MODE = env.OPEN_CASE_MODE ?? "CLASSIC";
   const { user } = useTelegramAuth();
-  if (debug) console.log("👤 [UnlockCase] user:", user);
 
   const isSyncing = useIsSyncing();
   const [inventory, setInventory] = useInventory();

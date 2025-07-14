@@ -80,7 +80,7 @@ export function InspectItem({
             </div>
             <div className="text-center">
               <div className="relative mx-auto inline-block">
-                <ItemImage className="m-auto my-8 max-w-[512px]" item={item} />
+                <ItemImage className="m-auto my-8 max-w-[90vw] max-h-[80vh] object-contain" item={item} />
                 {item.stickers !== undefined && (
                   <div className="absolute bottom-0 left-0 flex items-center justify-center">
                     {item.someStickers().map(([index, { id, wear }]) => (
