@@ -22,6 +22,7 @@ export default function CaseMechanics() {
     "#eb4b4b": "Mythical",
     "#ffd700": "Exotic",
   };
+  const [caseStatsList, setCaseStatsList] = useState([]);
 
   useEffect(() => {
       async function fetchStats() {
@@ -102,6 +103,46 @@ export default function CaseMechanics() {
 
           setDropStats(dropStats);
         }
+
+        // 📊 Аналитика по кейсам (name, revenue, EV, ROI)
+        const {data: caseData, error: caseDataErr } = await supabase
+          .from("case_openings")
+          .select("case_id, case_price, item_value");
+
+        if (caseDataErr) {
+          console.error("❌ Ошибка загрузки кейсов для аналитики:", caseDataErr);
+        } else {
+          const grouped: Record<string, { count: number; price: number; value: number }> = {};
+
+
+          for (const row of caseData) {
+            const case_price = row.case_price;
+            const name = row.case_id || "Без названия";
+            if (!grouped[name]) {
+              grouped[name] = { count: 0, price:0, value: 0 };
+            }
+            grouped[name].count += 1;
+            grouped[name].price += row.case_price || 0;
+            grouped[name].value += row.item_value || 0;
+          }
+
+          const result = Object.entries(grouped).map(([name, data]) => {
+            const ev = +(data.value / data.count).toFixed(2);
+            const houseEdge = +((1 - data.value / data.price) * 100).toFixed(1);
+            const status = houseEdge < 0 ? "Убыточный" : "Прибыльный";
+
+            return {
+              name,
+              case_price: +(data.price / data.count).toFixed(2),
+              opened: data.count,
+              revenue: +data.price.toFixed(0),
+              houseEdge,
+              ev,
+              status,
+            };
+          });
+          setCaseStatsList(result);
+        }
       }
         fetchStats();
       }, []);
@@ -109,13 +150,6 @@ export default function CaseMechanics() {
   const caseStats = {
     dailyAverage: 2240,
   }
-
-  const popularCases = [
-    { name: "Классический кейс", opened: 4567, revenue: 22835, roi: 125.4, ev: 18.3 },
-    { name: "Премиум кейс", opened: 3421, revenue: 34210, roi: 98.7, ev: 34.65 },
-    { name: "Мега кейс", opened: 2134, revenue: 21340, roi: 87.2, ev: 67.8 },
-    { name: "Стартовый кейс", opened: 5556, revenue: 11112, roi: 156.8, ev: 2.0 },
-  ]
 
   const getRarityColor = (rarity: string) => {
     switch (rarity) {
@@ -177,7 +211,7 @@ export default function CaseMechanics() {
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalRevenue.toLocaleString()}</div>
+              <div className="text-2xl font-bold">{totalRevenue.toLocaleString()} $TON</div>
               <div className="text-xs text-muted-foreground">Общая выручка</div>
             </CardContent>
           </Card>
@@ -186,7 +220,7 @@ export default function CaseMechanics() {
 
       {/* Popular Cases */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Популярные кейсы и их ROI</h3>
+        <h3 className="text-lg font-semibold mb-4">☑️Популярные кейсы и их House Edge</h3>
         <Card>
           <CardHeader>
             <CardTitle>Статистика по кейсам</CardTitle>
@@ -197,33 +231,35 @@ export default function CaseMechanics() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Название кейса</TableHead>
+                  <TableHead>Стоимость открытия</TableHead>
                   <TableHead>Открыто</TableHead>
                   <TableHead>Доход</TableHead>
-                  <TableHead>ROI</TableHead>
+                  <TableHead>House Edge</TableHead>
                   <TableHead>Expected Value</TableHead>
                   <TableHead>Статус</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {popularCases.map((caseItem) => (
+                {caseStatsList.map((caseItem) => (
                   <TableRow key={caseItem.name}>
                     <TableCell className="font-medium">{caseItem.name}</TableCell>
+                    <TableCell>{caseItem.case_price} $TON</TableCell>
                     <TableCell>{caseItem.opened.toLocaleString()}</TableCell>
-                    <TableCell>${caseItem.revenue.toLocaleString()}</TableCell>
+                    <TableCell>{caseItem.revenue.toLocaleString()} $TON</TableCell>
                     <TableCell>
                       <div className="flex items-center">
-                        {caseItem.roi > 100 ? (
+                        {caseItem.houseEdge > 0 ? (
                           <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
                         ) : (
                           <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
                         )}
-                        {caseItem.roi}%
+                        {Math.abs(caseItem.houseEdge)}%
                       </div>
                     </TableCell>
                     <TableCell>${caseItem.ev}</TableCell>
                     <TableCell>
-                      <Badge variant={caseItem.roi > 100 ? "default" : "secondary"}>
-                        {caseItem.roi > 100 ? "Прибыльный" : "Убыточный"}
+                      <Badge variant={caseItem.houseEdge > 0 ? "default" : "destructive"}>
+                        {caseItem.houseEdge > 0 ? "Прибыльный" : "Убыточный"}
                       </Badge>
                     </TableCell>
                   </TableRow>
