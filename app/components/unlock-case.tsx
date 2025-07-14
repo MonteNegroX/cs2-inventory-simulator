@@ -108,7 +108,7 @@ export function UnlockCase({
 
       await logCaseOpening({
         user_id: user.id,
-        case_id: caseItem.id,
+        case_id: caseItem.name,
         case_price: caseItem.price ?? 2, // ✅ логируем цену кейса
         item: itemForDb
       });
