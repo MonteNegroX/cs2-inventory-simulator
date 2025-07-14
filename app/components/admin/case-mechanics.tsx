@@ -14,6 +14,14 @@ export default function CaseMechanics() {
   const [totalOpened, setTotalOpened] = useState(0)
   const [averagePerUser, setAveragePerUser] = useState(0)
   const [totalRevenue, setTotalRevenue] = useState(0);
+  const [dropStats, setDropStats] = useState([]);
+  const rarityMap = {
+    "#4b69ff": "Rare",
+    "#8847ff": "Epic",
+    "#d32ce6": "Legendary",
+    "#eb4b4b": "Mythical",
+    "#ffd700": "Exotic",
+  };
 
   useEffect(() => {
       async function fetchStats() {
@@ -43,7 +51,7 @@ export default function CaseMechanics() {
         setAveragePerUser(openedCount && uniqueUsers ? +(openedCount / uniqueUsers).toFixed(2) : 0)
 
         // Выручка — сумма всех case_price
-        const { data:caseRows, error:caseErr } = await supabase
+        const { data: caseRows, error: caseErr } = await supabase
           .from("case_openings")
           .select("case_price");
 
@@ -53,10 +61,50 @@ export default function CaseMechanics() {
           const revenue = caseRows.reduce((sum, row) => sum + (row.case_price || 0), 0);
           setTotalRevenue(revenue);
         }
-      }
 
-      fetchStats();
-  }, [])
+        // 🧩 Дроп-таблица
+        const { data: drops, error: dropErr } = await supabase
+          .from("case_openings")
+          .select("item");
+
+        if (dropErr) {
+          console.error("❌ Ошибка получения предметов:", dropErr);
+        } else {
+          const rarityMap: Record<string, string> = {
+            "#4b69ff": "Rare",
+            "#8847ff": "Epic",
+            "#d32ce6": "Legendary",
+            "#eb4b4b": "Mythical",
+            "#ffd700": "Exotic",
+          };
+
+          const planned: Record<string, number> = {
+            "Rare": 80.0,
+            "Epic": 16.0,
+            "Legendary": 3.2,
+            "Mythical": 0.64,
+          };
+
+          const counts: Record<string, number> = {};
+          drops.forEach((row) => {
+            const rarityColor = row.item?.rarity;
+            const rarityName = rarityMap[rarityColor] ?? "Неизвестно";
+            counts[rarityName] = (counts[rarityName] || 0) + 1;
+          });
+
+          const total = drops.length;
+          const dropStats = Object.entries(counts).map(([rarity, count]) => {
+            const actual = +(count / total * 100).toFixed(2);
+            const plannedChance = planned[rarity] ?? 0;
+            const deviation = +(actual - plannedChance).toFixed(2);
+            return { rarity, plannedChance, actualChance: actual, deviation };
+          });
+
+          setDropStats(dropStats);
+        }
+      }
+        fetchStats();
+      }, []);
 
   const caseStats = {
     dailyAverage: 2240,
@@ -67,13 +115,6 @@ export default function CaseMechanics() {
     { name: "Премиум кейс", opened: 3421, revenue: 34210, roi: 98.7, ev: 34.65 },
     { name: "Мега кейс", opened: 2134, revenue: 21340, roi: 87.2, ev: 67.8 },
     { name: "Стартовый кейс", opened: 5556, revenue: 11112, roi: 156.8, ev: 2.0 },
-  ]
-
-  const dropTable = [
-    { item: "Обычный предмет", rarity: "Common", plannedChance: 65.0, actualChance: 67.2, deviation: 2.2 },
-    { item: "Редкий предмет", rarity: "Rare", plannedChance: 25.0, actualChance: 23.8, deviation: -1.2 },
-    { item: "Эпический предмет", rarity: "Epic", plannedChance: 8.0, actualChance: 7.5, deviation: -0.5 },
-    { item: "Легендарный предмет", rarity: "Legendary", plannedChance: 2.0, actualChance: 1.5, deviation: -0.5 },
   ]
 
   const getRarityColor = (rarity: string) => {
@@ -195,7 +236,7 @@ export default function CaseMechanics() {
 
       {/* Drop Table Analysis */}
       <div>
-        <h3 className="text-lg font-semibold mb-4">Дроп-таблица в разрезе реальных результатов</h3>
+        <h3 className="text-lg font-semibold mb-4">☑️Дроп-таблица в разрезе реальных результатов</h3>
         <Card>
           <CardHeader>
             <CardTitle>Анализ выпадений</CardTitle>
@@ -205,8 +246,8 @@ export default function CaseMechanics() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Предмет</TableHead>
                   <TableHead>Редкость</TableHead>
+                  <TableHead>Цвет</TableHead>
                   <TableHead>Планируемый %</TableHead>
                   <TableHead>Фактический %</TableHead>
                   <TableHead>Отклонение</TableHead>
@@ -214,9 +255,9 @@ export default function CaseMechanics() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {dropTable.map((item) => (
-                  <TableRow key={item.item}>
-                    <TableCell className="font-medium">{item.item}</TableCell>
+                {dropStats.map((item) => (
+                  <TableRow key={item.rarity}>
+                    <TableCell className="font-medium">{item.rarity}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <div className={`w-3 h-3 rounded-full mr-2 ${getRarityColor(item.rarity)}`}></div>
