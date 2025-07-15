@@ -43,6 +43,7 @@ import { getCasePrice } from "~/constants/case-prices";
 import { LottieRefCurrentProps } from "lottie-react";
 
 
+const lottieCache = new Map<string, any>();
 
 export function InventoryItem({
   disableContextMenu,
@@ -118,34 +119,55 @@ export function InventoryItem({
   // ✅ Применяем кастомные overrides, включая price из overrides.json
   const overriddenItem = applyCustomOverrides(item);
   const animationPath = (overriddenItem as any).animation ?? null;
-  const [lottieData, setLottieData] = useState(null);
+  if (lottieCache.has(animationPath)) {
+  console.log("💾 Loaded from cache:", animationPath);
+}
+
   const economy = CS2Economy.getById(item.id);
   // анимация отключается для контейнеров
   const isContainer = isContainerItem(overriddenItem);
   const casePrice = isContainer ? getCasePrice(overriddenItem.id) : undefined;
   const lottieRef = useRef<LottieRefCurrentProps>(null);
 
+  const [animationData, setAnimationData] = useState<any>(null);
+  const [loaded, setLoaded] = useState(false);
+
 
   useEffect(() => {
-    if (animationPath) {
-      fetch(animationPath)
-        .then((res) => res.json())
-        .then((data) => setLottieData(data))
-        .catch((err) => console.error("❌ Ошибка загрузки Lottie:", err));
-    }
+    if (!animationPath) return;
+
+    const loadLottie = async () => {
+      if (lottieCache.has(animationPath)) {
+        setAnimationData(lottieCache.get(animationPath));
+        setLoaded(true);
+        return;
+      }
+
+      try {
+        const res = await fetch(animationPath);
+        const json = await res.json();
+        console.log("✅ Fetched Lottie JSON:", json); // ← этот лог важен
+        lottieCache.set(animationPath, json);
+        setAnimationData(json);
+        setLoaded(true);
+      } catch (err) {
+        console.error("❌ Failed to load Lottie animation:", err);
+      }
+    };
+
+    loadLottie();
   }, [animationPath]);
 
   useEffect(() => {
-  if (lottieData && !isContainer && lottieRef.current) {
+  if (animationData  && !isContainer && lottieRef.current) {
     lottieRef.current.play();
   }
-}, [lottieData, isContainer]);
+}, [animationData , isContainer]);
 
   // ✅ Берём price только из overrides.json
   const dynamicPrice = overriddenItem.price ?? undefined;
   console.log(`💰 dynamicPrice для item.id ${item.id} =`, dynamicPrice);
 
-  const lottieCache = new Map<string, any>();
 
 
   const {
@@ -254,7 +276,7 @@ export function InventoryItem({
   >
     <Lottie
       lottieRef={lottieRef}
-      animationData={lottieData}
+      animationData={animationData}
       loop={false}
       autoplay={false}
       style={{ width: "100%", height: "100%" }}
