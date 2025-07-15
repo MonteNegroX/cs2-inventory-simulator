@@ -217,6 +217,7 @@ export function Inventory() {
         {displayedItems.map((item) => (
           <div key={item.uid} className="flex items-start justify-center">
             <InventoryItem
+              disableHover
               {...item}
               {...(isSelectingAnItem
                 ? {

@@ -258,7 +258,7 @@ export function InventoryItem({
     />
     {/* Название (только предметы)*/}
     {!isContainer && (
-    <div className="absolute bottom-0 w-full text-center text-[15px] text-white bg-black/50 backdrop-blur-sm px-1">
+    <div className="absolute bottom-0 w-full text-center text-[15px] text-white bg-gradient-to-r from-blue-500 via-black-500 to-blue-500 backdrop-blur-sm px-1">
       {overriddenItem.name}
     </div>
       )}
