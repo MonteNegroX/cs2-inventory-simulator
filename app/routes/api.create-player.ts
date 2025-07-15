@@ -1,5 +1,5 @@
 // app/routes/api.create-player.ts
-
+// todo реферальная система
 import { supabaseAdmin } from "~/db/supabaseServer";
 
 export const action = async ({ request }) => {
@@ -47,6 +47,7 @@ export const action = async ({ request }) => {
           inventory: [],
           balance: 0,
           net_loss: 0,
+          avatar_url: `https://api.dicebear.com/9.x/adventurer/svg?seed=${user_id}&backgroundColor=b6e3f4,c0aede,d1d4f9` // 👈 добавлено
         },
         { onConflict: "user_id" }
       )
