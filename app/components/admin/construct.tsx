@@ -55,6 +55,16 @@ export default function Constructor() {
       .sort((a, b) => a.price - b.price);
   };
 
+  const sortedItemEntries = [...itemEntries].sort(([_, a], [__, b]) => {
+    const aNoImage = !a.image ? 1 : 0;
+    const bNoImage = !b.image ? 1 : 0;
+    if (aNoImage !== bNoImage) return bNoImage - aNoImage;
+
+    const aNoAnim = !a.animation ? 1 : 0;
+    const bNoAnim = !b.animation ? 1 : 0;
+    return bNoAnim - aNoAnim;
+  });
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Левая колонка: Таблица предметов */}
@@ -71,6 +81,8 @@ export default function Constructor() {
                 <th className="p-2">ID</th>
                 <th className="p-2">Название</th>
                 <th className="p-2">Цена</th>
+                <th className="p-2">🖼️ Картинка</th>
+                <th className="p-2">🎞️ Анимация</th>
               </tr>
             </thead>
             <tbody>
@@ -79,6 +91,16 @@ export default function Constructor() {
                   <td className="p-2">{id}</td>
                   <td className="p-2">{data.name}</td>
                   <td className="p-2">{data.price}</td>
+                  <td className="p-2">
+                    {data.image ? (
+                      <img src={data.image} alt={data.name} className="h-10" />
+                    ) : (
+                      "_"
+                    )}
+                  </td>
+                  <td className="p-2">
+                    {data.animation ? "✅" : "❌"}
+                  </td>
                 </tr>
               ))}
             </tbody>
