@@ -46,12 +46,15 @@ export function UnlockCaseContainer({
   const translate = useTranslate();
   const nameItemString = useNameItemString();
   const needsToAddKey = keyItem === undefined && neededKeyItem !== undefined;
-  const CASE_PRICE = 2;
+  const CASE_PRICES: Record<number, number> = {
+    9440: 0.5,
+  };
+  const CASE_PRICE = CASE_PRICES[caseItem.id];
   const { balance, deduct } = useWalletBalance();
 
   function handlePaidUnlock() {
     if (!deduct(CASE_PRICE)) {
-      alert(translate("Недостаточно TON для открытия кейса"));
+      alert("Недостаточно TON для открытия кейса");
       return;
     }
 

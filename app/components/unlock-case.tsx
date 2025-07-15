@@ -20,6 +20,8 @@ import { applyCustomOverrides } from "~/utils/custom-overrides";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
 import { supabase } from "~/db/supabase";
 import { logCaseOpening } from "~/utils/logCaseOpening";
+import { getCasePrice } from "~/constants/case-prices";
+
 
 export function UnlockCase({
   caseUid,
@@ -105,10 +107,12 @@ export function UnlockCase({
         }
       ]);
 
+      const case_id = caseItem.id;
+
       await logCaseOpening({
         user_id: user.id,
-        case_id: caseItem.name,
-        case_price: caseItem.price ?? 2, // ✅ логируем цену кейса
+        case_name: caseItem.name,
+        case_id,
         item: itemForDb
       });
 

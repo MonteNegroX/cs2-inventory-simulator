@@ -1,14 +1,14 @@
 // app/utils/logCaseOpening.ts
-import { supabase} from "~/db/supabase";
+import { supabase } from "~/db/supabase";
+import { getCasePrice } from "~/constants/case-prices";
 
 type LogCaseOpeningParams = {
   user_id: number;
-  case_id: string;
-  case_price: number;
-  item: any; // структура такая же, как в inventory
+  case_id: number; // <- теперь строго number
+  item: any;
+  case_name?: string;
 };
 
-// 👇 добавим вспомогательную функцию обновления net_loss
 async function updateNetLoss(user_id: number) {
   const { data, error } = await supabase
     .from("case_openings")
@@ -26,7 +26,7 @@ async function updateNetLoss(user_id: number) {
 
   const { error: updateError } = await supabase
     .from("players")
-    .update({net_loss: netLoss })
+    .update({ net_loss: netLoss })
     .eq("user_id", user_id);
 
   if (updateError) {
@@ -36,35 +36,26 @@ async function updateNetLoss(user_id: number) {
   }
 }
 
-// ⏫ Список user_id с бустом (временно захардкожен)
-const waitlistBoostedUserIds = [666555]; // ← сюда вставь свой user_id
+const waitlistBoostedUserIds = [666555];
 
 function getDailyBonusMultiplier(user_id: number): number {
-  if (waitlistBoostedUserIds.includes(user_id)) {
-    return 1.2;
-  }
-
-  return 1;
+  return waitlistBoostedUserIds.includes(user_id) ? 1.2 : 1;
 }
 
-// TODO: Заменить захардкоженный список на запрос из Supabase таблицы waitlist
-
-
-// 👇 Добавим XP за net_loss
 async function addXpFromNetLoss(user_id: number, case_price: number, item_value: number) {
   const net_loss = case_price - item_value;
 
   if (net_loss > 0) {
     const multiplier = getDailyBonusMultiplier(user_id);
-    const xpAmount = Math.floor(net_loss * multiplier * 10); // ⚡ x10 буст
+    const xpAmount = Math.floor(net_loss * multiplier * 10);
 
     const { error } = await supabase.from("xp_history").insert([
       {
         user_id,
         xp_amount: xpAmount,
         source: "case",
-        created_at: new Date().toISOString()
-      }
+        created_at: new Date().toISOString(),
+      },
     ]);
 
     if (error) {
@@ -75,14 +66,14 @@ async function addXpFromNetLoss(user_id: number, case_price: number, item_value:
   }
 }
 
-
 export async function logCaseOpening({
   user_id,
   case_id,
-  case_price,
-  item
+  item,
+  case_name,
 }: LogCaseOpeningParams) {
   const item_value = item?.price || 0;
+  const case_price = getCasePrice(case_id);
 
   const { error } = await supabase.from("case_openings").insert([
     {
@@ -90,8 +81,9 @@ export async function logCaseOpening({
       case_id,
       case_price,
       item,
-      opened_at: new Date().toISOString()
-    }
+      case_name,
+      opened_at: new Date().toISOString(),
+    },
   ]);
 
   if (error) {
@@ -102,4 +94,3 @@ export async function logCaseOpening({
     await addXpFromNetLoss(user_id, case_price, item_value);
   }
 }
-
