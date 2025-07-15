@@ -1,13 +1,4 @@
 {
-  "9504": {
-    "contents": [
-  1918,
-  1920,
-  1942,
-  1943
-],
-    "name": "Container | 2 TON CONTAINER"
-  },
   "1859": {
     "name": "Hanging Star",
     "image": "downloaded_webp/hangingstar.webp",
@@ -36,6 +27,7 @@
   "1864": {
     "name": "Berry Box",
     "image": "downloaded_webp/berrybox.webp",
+    "animation": "/lottie/berry_box.json",
     "price": "5.7"
   },
   "1865": {
@@ -387,5 +379,25 @@
     "name": "Genie Lamp",
     "image": "downloaded_webp/genielamp.webp",
     "price": "60.4"
+  },
+  "9440": {
+    "name": "Container | Контейнер еще один",
+    "contents": [
+      1918,
+      1942,
+      1943,
+      1910,
+      1859,
+      1860,
+      1864,
+      1866
+    ]
+  },
+  "9504": {
+    "contents": [
+      1918,
+      1918
+    ],
+    "name": "Container | Контейнер за 2 TON "
   }
 }
