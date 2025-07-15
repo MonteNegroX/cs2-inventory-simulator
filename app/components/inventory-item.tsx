@@ -145,6 +145,9 @@ export function InventoryItem({
   const dynamicPrice = overriddenItem.price ?? undefined;
   console.log(`💰 dynamicPrice для item.id ${item.id} =`, dynamicPrice);
 
+  const lottieCache = new Map<string, any>();
+
+
   const {
     clickContext,
     clickRefs,
