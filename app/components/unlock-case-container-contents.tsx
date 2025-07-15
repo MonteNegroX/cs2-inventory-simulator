@@ -41,7 +41,7 @@ export function UnlockCaseContainerContents({
       }}
       ref={ref}
     >
-      <div className="m-auto lg:max-w-[1024px]">
+      <div className="m-auto min-h-[60vh] lg:max-w-[1024px]">
         <h2 className="my-2 text-center">Содержит следующие награды:</h2>
         <div className="grid max-h-[70vh] grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-center justify-items-center overflow-y-auto pb-4">
           {[
