@@ -68,6 +68,7 @@ export default function TopPlayers() {
 
   return (
     <div className="relative w-full max-w-md p-4 text-white">
+      {/* TODO 🔘 Кнопка закрытия (только в браузере) */}
       <h2 className="text-center text-xl font-bold mb-6">🏆 ТОП игроков за сутки</h2>
 
       <div className="space-y-2">
