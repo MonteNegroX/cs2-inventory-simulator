@@ -33,10 +33,10 @@ export function UnlockCaseContainerUnlocked({
 
   function handleLoad() {
     timeoutRef.current = setTimeout(() => {
-      setRevealScale(1);
       playSound(
         `case_awarded_${rarity as "common" | "uncommon" | "rare" | "mythical" | "legendary" | "ancient"}`
       );
+      setRevealScale(1);
     }, 256);
   }
 
@@ -56,6 +56,13 @@ export function UnlockCaseContainerUnlocked({
         .catch(console.error);
     }
   }, [animationPath]);
+
+  useEffect(() => {
+    if (animationData) {
+      handleLoad(); // запускает reveal + звук
+    }
+  }, [animationData]);
+
 
   return (
     <div className="flex h-full w-full items-center justify-center text-center drop-shadow-sm">
@@ -77,9 +84,8 @@ export function UnlockCaseContainerUnlocked({
           <Lottie
             animationData={animationData}
             loop={false}
-            autoplay={true}
-            className="[transform-origin:center] [transition:all_cubic-bezier(0.4,0,0.2,1)_250ms]"
-            style={{ transform: `scale(${revealScale})` }}
+            autoplay
+            className="opacity-100 transition-opacity duration-300 ease-in-out"
             onComplete={handleLoad}
           />
           </div>

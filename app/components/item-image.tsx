@@ -1,8 +1,3 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Ian Lucas. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
 import { CS2EconomyItem, CS2InventoryItem } from "@ianlucas/cs2-lib";
 import clsx from "clsx";
 import { ComponentProps, useEffect, useState } from "react";
@@ -11,6 +6,7 @@ import { getCDNUrl } from "~/utils/economy";
 import { noop } from "~/utils/misc";
 import { FillSpinner } from "./fill-spinner";
 import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
+import Lottie from "lottie-react";
 
 let cached: string[] = [];
 
@@ -21,6 +17,7 @@ export function ItemImage({
   onLoad,
   type,
   wear,
+  disableAnimation = false,
   ...props
 }: Omit<ComponentProps<"img">, "onLoad"> & {
   item: CS2EconomyItem | CS2InventoryItem;
@@ -28,31 +25,49 @@ export function ItemImage({
   onLoad?: () => void;
   type?: "default" | "collection" | "specials";
   wear?: number;
+  disableAnimation?: boolean;
 }) {
   type ??= "default";
 
-  let url =
-    CUSTOM_OVERRIDES[item.id]?.image ??
+  const override = CUSTOM_OVERRIDES[item.id];
+  const animationPath = !disableAnimation ? override?.animation : undefined;
+
+  const url =
+    override?.image ??
     getCDNUrl(
       type === "default"
         ? item.getImage(wear)
         : type === "collection"
-          ? item.getCollectionImage()
-          : item.getSpecialsImage()
+        ? item.getCollectionImage()
+        : item.getSpecialsImage()
     );
 
+  const [animationData, setAnimationData] = useState<any>(null);
   const [loaded, setLoaded] = useState(
-    cached.includes(url) || url.includes("steamcommunity")
+    animationPath ? false : cached.includes(url) || url.includes("steamcommunity")
   );
 
+  // Lottie animation loader
   useEffect(() => {
-    if (!loaded) {
-      let controller: AbortController | undefined = undefined;
+    if (animationPath) {
+      fetch(animationPath)
+        .then((res) => res.json())
+        .then((json) => {
+          setAnimationData(json);
+          setLoaded(true);
+        })
+        .catch(noop);
+    }
+  }, [animationPath]);
+
+  // Image loader
+  useEffect(() => {
+    if (!animationPath && !loaded) {
+      let controller: AbortController | undefined;
       function fetchImage() {
         controller = new AbortController();
         fetch(url, { signal: controller?.signal })
           .then(() => {
-            controller = undefined;
             setLoaded(true);
             if (!isServerContext) {
               cached.push(url);
@@ -66,7 +81,7 @@ export function ItemImage({
         controller?.abort();
       };
     }
-  }, [lazy, loaded, url]);
+  }, [lazy, loaded, animationPath, url]);
 
   useEffect(() => {
     if (loaded) {
@@ -88,13 +103,25 @@ export function ItemImage({
     );
   }
 
+  if (animationData) {
+    return (
+      <Lottie
+        animationData={animationData}
+        loop={false}
+        autoplay
+        className={clsx("aspect-256/192", className)}
+        {...props}
+      />
+    );
+  }
+
   return (
     <img
       alt={item.name}
       draggable={false}
       src={url}
       {...props}
-      className={clsx(className)}
+      className={clsx("aspect-256/192", className)}
     />
   );
 }

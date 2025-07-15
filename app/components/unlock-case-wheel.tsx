@@ -48,23 +48,23 @@ export function UnlockCaseWheel({
         <div className="absolute top-0 left-0 flex h-full w-full items-center justify-center [mask-image:radial-gradient(circle_closest-side,#fff0_246px,#000_246px)] opacity-90 blur-[2px]">
           <div className="h-[192px] w-[1269.980px] overflow-hidden [mask-image:linear-gradient(to_left,#fff0_0%,#000_10%,#000_90%,#fff0_100%)]">
             <UnlockCaseWheelItems
+              disableAnimation// ✅
               items={items}
               caseItem={caseItem}
               translateX={translateX}
               instant={!isDisplaying}
-              disableAnimation={true} // ✅
             />
           </div>
         </div>
         <div className="absolute top-0 left-0 flex w-full scale-[1.128] items-center justify-center opacity-95">
           <div className="relative flex h-[496.8px] w-[1269.980px] items-center bg-black/50 [clip-path:circle(22.7%_at_50%_50%)]">
             <UnlockCaseWheelItems
+              disableAnimation // ✅
               ref={hitsRef}
               items={items}
               caseItem={caseItem}
               translateX={translateX}
               instant={!isDisplaying}
-              disableAnimation={true} // ✅
             />
           </div>
         </div>
