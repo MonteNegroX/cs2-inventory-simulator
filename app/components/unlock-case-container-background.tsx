@@ -1,8 +1,4 @@
-/*---------------------------------------------------------------------------------------------
- *  Copyright (c) Ian Lucas. All rights reserved.
- *  Licensed under the MIT License. See License.txt in the project root for license information.
- *--------------------------------------------------------------------------------------------*/
-
+// app/components/unlock-case-container-background.tsx
 import { CS2EconomyItem } from "@ianlucas/cs2-lib";
 import clsx from "clsx";
 import { useState } from "react";
@@ -32,7 +28,7 @@ export function UnlockCaseContainerBackground({
         transform: `scale(${scale})`
       }}
     >
-      <ItemImage className="w-[256px]" item={caseItem} onLoad={handleLoad} />
+      <ItemImage className="w-[256px] -translate-y-40" item={caseItem} onLoad={handleLoad} />
     </div>
   );
 }

@@ -69,10 +69,10 @@ export function UnlockCaseContainer({
       />
       <div className="flex w-full flex-col justify-center gap-4">
         <UseItemHeader
-          actionDesc={translate("CaseUnlock")}
+          actionDesc="Открыть капсулу"
           actionItem={nameItemString(caseItem)}
-          title={translate("CaseUnlockContainer")}
-          warning={translate("CaseOnceWarn")}
+          title=""
+          warning=""
         />
 
         <UnlockCaseWheel

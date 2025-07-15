@@ -29,11 +29,6 @@ export function UseItemHeader({
           {actionItem !== undefined && <strong>{actionItem}</strong>}
         </div>
       )}
-      <div className="mt-2 flex items-center justify-center gap-2">
-        <InfoIcon className="h-4" />
-        <span>{warning}</span>
-        {warningItem !== undefined && <strong>{warningItem}</strong>}
-      </div>
     </div>
   );
 }

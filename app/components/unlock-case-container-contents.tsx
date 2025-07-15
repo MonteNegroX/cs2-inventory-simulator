@@ -8,6 +8,7 @@ import { ElementRef, useEffect, useRef, useState } from "react";
 import { useTranslate } from "./app-context";
 import { InventoryItemTile } from "./inventory-item-tile";
 import { InventoryItemTileSpecial } from "./inventory-item-tile-special";
+import { InventoryItem } from "~/components/inventory-item";
 
 export function UnlockCaseContainerContents({
   caseItem,
@@ -41,13 +42,20 @@ export function UnlockCaseContainerContents({
       ref={ref}
     >
       <div className="m-auto lg:max-w-[1024px]">
-        <h2 className="my-2">{translate("CaseContainsOne")}</h2>
-        <div className="flex h-[320px] flex-wrap gap-3 overflow-y-scroll pb-4">
+        <h2 className="my-2 text-center">Содержит следующие награды:</h2>
+        <div className="grid max-h-[70vh] grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 justify-center justify-items-center overflow-y-auto pb-4">
           {[
             ...caseItem
               .listContents(true)
               .map((item, index) => (
-                <InventoryItemTile key={index} item={item} />
+                <InventoryItem
+                  key={index}
+                  uid={-1}
+                  item={item}
+                  disableContextMenu
+                  disableHover
+                  onclick={undefined}
+                />
               )),
             caseItem.specials !== undefined && (
               <InventoryItemTileSpecial key={-1} containerItem={caseItem} />
