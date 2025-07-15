@@ -35,9 +35,13 @@ import { useWalletBalance } from "~/components/WalletBalanceContext";
 import { CS2ItemType, CS2RarityColor } from "@ianlucas/cs2-lib";
 import { applyCustomOverrides } from "~/utils/custom-overrides";
 import Lottie from "lottie-react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useTelegramAuth } from "~/contexts/TelegramAuthContext";
 import { supabase } from "~/db/supabase";
+import { isContainerItem } from "~/utils/inventory-filters";
+import { getCasePrice } from "~/constants/case-prices";
+import { LottieRefCurrentProps } from "lottie-react";
+
 
 
 export function InventoryItem({
@@ -116,6 +120,11 @@ export function InventoryItem({
   const animationPath = (overriddenItem as any).animation ?? null;
   const [lottieData, setLottieData] = useState(null);
   const economy = CS2Economy.getById(item.id);
+  // анимация отключается для контейнеров
+  const isContainer = isContainerItem(overriddenItem);
+  const casePrice = isContainer ? getCasePrice(overriddenItem.id) : undefined;
+  const lottieRef = useRef<LottieRefCurrentProps>(null);
+
 
   useEffect(() => {
     if (animationPath) {
@@ -125,6 +134,12 @@ export function InventoryItem({
         .catch((err) => console.error("❌ Ошибка загрузки Lottie:", err));
     }
   }, [animationPath]);
+
+  useEffect(() => {
+  if (lottieData && !isContainer && lottieRef.current) {
+    lottieRef.current.play();
+  }
+}, [lottieData, isContainer]);
 
   // ✅ Берём price только из overrides.json
   const dynamicPrice = overriddenItem.price ?? undefined;
@@ -225,24 +240,54 @@ export function InventoryItem({
     {...getHoverReferenceProps(getClickReferenceProps())}
   >
     {animationPath ? (
-  <div className="relative w-full h-full flex items-center justify-center">
+  <div className="relative w-full h-full flex items-center justify-center"
+  onClick={
+    canUnlockContainer
+      ? () => onUnlockContainer?.(uid)
+      : onClick !== undefined
+      ? close(() => onClick(uid))
+      :undefined
+  }
+  >
     <Lottie
+      lottieRef={lottieRef}
       animationData={lottieData}
       loop={false}
-      autoplay
-      style={{ width: "80%", height: "80%" }}
+      autoplay={false}
+      style={{ width: "100%", height: "100%" }}
     />
-    {/* Название */}
-    <div className="absolute bottom-0 w-full text-center text-xs text-white bg-black/50 backdrop-blur-sm px-1">
+    {/* Название (только предметы)*/}
+    {!isContainer && (
+    <div className="absolute bottom-0 w-full text-center text-[15px] text-white bg-black/50 backdrop-blur-sm px-1">
       {overriddenItem.name}
     </div>
-    {/* Цена */}
-    {dynamicPrice !== undefined && (
-      <div className="absolute top-0 right-0 m-1 flex items-center gap-1 rounded bg-black/50 px-1 py-0.5 text-[10px] text-white backdrop-blur-sm">
-        💎
-        {Number(dynamicPrice).toLocaleString()}
+      )}
+    {/* Цена предмета */}
+    {!isContainer && dynamicPrice !== undefined && (
+      <div className="absolute top-0 right-0 m-1 flex items-center gap-1 rounded bg-black/50 px-1 py-0.5 text-[18px] text-white backdrop-blur-sm">
+        {Number(dynamicPrice).toFixed(1)}
+        <img
+          src="https://ton.org/download/ton_symbol.svg"
+          alt="TON"
+          className="h-5 w-5 ml-1 inline-block"
+        />
       </div>
     )}
+    {/* 🎁Цена открытия контейнера */}
+    {isContainer && casePrice !== undefined && (
+      <div className="absolute top-0 right-0 m-1 flex items-center gap-1 rounded bg-black/50 px-1 py-0.5 text-[18px] text-white backdrop-blur-sm">
+        {casePrice.toFixed(1)}
+        <img
+          src="https://ton.org/download/ton_symbol.svg"
+          alt="TON"
+          className="h-5 w-5 ml-1 inline-block"
+        />
+      </div>
+    )}
+    {/* Название без контейнер*/}
+    <div className="absolute bottom-0 w-full text-center text-[15px] text-white bg-black/50 backdrop-blur-sm px-1 whitespace-nowrap overflow-hidden text-ellipsis">
+      {overriddenItem.name.replace(/^Container\s*\|/i, "").trim()}
+      </div>
   </div>
 ) : (
   <InventoryItemTile

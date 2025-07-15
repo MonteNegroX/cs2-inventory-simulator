@@ -7,6 +7,8 @@ import { noop } from "~/utils/misc";
 import { FillSpinner } from "./fill-spinner";
 import { CUSTOM_OVERRIDES } from "~/utils/custom-overrides";
 import Lottie from "lottie-react";
+import { isContainerItem } from "~/utils/inventory-filters";
+
 
 let cached: string[] = [];
 
@@ -31,6 +33,7 @@ export function ItemImage({
 
   const override = CUSTOM_OVERRIDES[item.id];
   const animationPath = !disableAnimation ? override?.animation : undefined;
+  const shouldAutoplay = !isContainerItem(item);
 
   const url =
     override?.image ??
@@ -108,7 +111,7 @@ export function ItemImage({
       <Lottie
         animationData={animationData}
         loop={false}
-        autoplay
+        autoplay={shouldAutoplay}
         className={clsx("aspect-256/192", className)}
         {...props}
       />
