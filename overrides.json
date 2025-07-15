@@ -381,7 +381,7 @@
     "price": "60.4"
   },
   "9440": {
-    "name": "Container | Контейнер еще один",
+    "name": "Container | КАПСУЛА СТАРТ",
     "contents": [
       1918,
       1942,
@@ -391,13 +391,15 @@
       1860,
       1864,
       1866
-    ]
+    ],
+    "animation": "/lottie/red_box.json"
   },
   "9504": {
     "contents": [
       1918,
       1918
     ],
+    "animation": "/lottie/red_box.json",
     "name": "Container | Контейнер за 2 TON "
   }
 }
