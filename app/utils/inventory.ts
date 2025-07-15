@@ -80,19 +80,21 @@ export function createFakeInventoryItemFromBase(item: CS2BaseInventoryItem) {
   return inventoryItem;
 }
 
-export function getFreeItemsToDisplay(hideFreeItems = false) {
+export function getFreeItemsToDisplay(hideFreeItems = true) {
   if (hideFreeItems) {
     return [];
   }
-  return CS2Economy.filterItems({
-    free: true
-  }).map((item, index) => ({
-    equipped: [],
-    item: createFakeInventoryItem(item, {
+
+  return CS2Economy
+    .filterItems({ free: true })
+    .filter(item => !item.name.toLowerCase().includes("tool")) // 🔍 Фильтрация по названию
+    .map((item, index) => ({
+      equipped: [],
+      item: createFakeInventoryItem(item, {
+        uid: -1 * (index + 1)
+      }),
       uid: -1 * (index + 1)
-    }),
-    uid: -1 * (index + 1)
-  }));
+    }));
 }
 
 export function getInventoryItemShareUrl(
