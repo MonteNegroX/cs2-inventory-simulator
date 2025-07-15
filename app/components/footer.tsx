@@ -14,7 +14,7 @@ export function Footer() {
 
   const menuItems = [
     { to: "/", label: "КЕЙСЫ", icon: Home },
-    { to: "/board", label: "ТОП", icon: Flame },
+    { to: "/top", label: "ТОП", icon: Flame },
     { to: "/quest", label: "КВЕСТ", icon: Zap },
     { to: "/profile", label: "ИНВЕНТАРЬ", icon: User },
   ];
@@ -34,6 +34,10 @@ export function Footer() {
         console.log("👤 Applying GraphicArt filter:", index);
         handlePrimaryClick(index)();
       }
+    }
+    if (to === "/top") {
+      navigate("/top");
+      return;
     }
     navigate(to);
   };
